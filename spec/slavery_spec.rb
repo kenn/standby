@@ -6,7 +6,13 @@ describe Slavery do
   end
 
   it 'sets thread local' do
-    Slavery.on_slave { on_slave?.should == true }
+    Slavery.on_master { on_slave?.should == false }
+    Slavery.on_slave  { on_slave?.should == true }
+  end
+
+  it 'returns value from block' do
+    Slavery.on_master { User.count }.should == 2
+    Slavery.on_slave  { User.count }.should == 1
   end
 
   it 'handles nested calls' do
@@ -33,17 +39,17 @@ describe Slavery do
     end
   end
 
-  # it 'disables in transaction' do
-  #   ActiveRecord::Base.transaction do
-  #     expect { ActiveRecord::Base.slaveryable? }.to raise_error(Slavery::Error)
-  #   end
-  # end
+  it 'disables in transaction' do
+    User.transaction do
+      expect { User.slaveryable? }.to raise_error(Slavery::Error)
+    end
+  end
 
   it 'disables by configuration' do
     Slavery.stub(:disabled).and_return(false)
-    Slavery.on_slave { ActiveRecord::Base.slaveryable?.should == true }
+    Slavery.on_slave { User.slaveryable?.should == true }
 
     Slavery.stub(:disabled).and_return(true)
-    Slavery.on_slave { ActiveRecord::Base.slaveryable?.should == false }
+    Slavery.on_slave { User.slaveryable?.should == false }
   end
 end

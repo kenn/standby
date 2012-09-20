@@ -6,8 +6,6 @@ require 'active_support/core_ext/module/attribute_accessors'
 module Slavery
   extend ActiveSupport::Concern
 
-  mattr_accessor :disabled
-
   included do
     class << self
       alias_method_chain :connection, :slavery
@@ -15,6 +13,8 @@ module Slavery
   end
 
   class Error < StandardError; end
+
+  mattr_accessor :disabled
 
   module ModuleFunctions
     def on_slave(&block)
@@ -26,7 +26,7 @@ module Slavery
     end
 
     def env
-      self.env = ENV['RAILS_ENV'] || ENV['RACK_ENV'] || 'development' unless @env
+      self.env = defined?(Rails) ? Rails.env.to_s : 'development' unless @env
       @env
     end
 
@@ -38,14 +38,14 @@ module Slavery
 
   module ClassMethods
     def on_slave(&block)
-      run_on true, &block
+      with_slavery true, &block
     end
 
     def on_master(&block)
-      run_on false, &block
+      with_slavery false, &block
     end
 
-    def run_on(new_value)
+    def with_slavery(new_value)
       old_value = Thread.current[:on_slave] # Save for recursive nested calls
       Thread.current[:on_slave] = new_value
       yield
@@ -62,7 +62,7 @@ module Slavery
     end
 
     def slaveryable?
-      inside_transaction = master_connection.open_transactions > (Slavery.env.test? ? 1 : 0)
+      inside_transaction = master_connection.open_transactions > 0
       raise Error.new('on_slave cannot be used inside transaction block!') if inside_transaction
 
       !Slavery.disabled
@@ -76,12 +76,14 @@ module Slavery
       slave_connection_holder.connection_without_slavery
     end
 
-    # Create anonymous class to hold slave connection
+    # Create an anonymous AR class to hold slave connection
     def slave_connection_holder
       @slave_connection_holder ||= Class.new(ActiveRecord::Base) {
         self.abstract_class = true
         establish_connection("#{Slavery.env}_slave")
       }
+    rescue ActiveRecord::AdapterNotSpecified
+      raise Error.new("#{Slavery.env}_slave does not exist!")
     end
   end
 end

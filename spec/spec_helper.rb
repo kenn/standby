@@ -10,6 +10,7 @@ ActiveRecord::Base.send(:include, Slavery)
 class User < ActiveRecord::Base
 end
 
+# Should be equal to Rails.env
 Slavery.env = 'test'
 
 ActiveRecord::Base.configurations = {
@@ -17,15 +18,16 @@ ActiveRecord::Base.configurations = {
   'test_slave' =>  { adapter: 'sqlite3', database: 'test_slave_db' }
 }
 
-# # Create two records on master
-# ActiveRecord::Base.establish_connection(:test)
-# ActiveRecord::Base.connection.create_table :users, force: true
-# User.create
-# User.create
+# Create two records on master
+ActiveRecord::Base.establish_connection(:test)
+ActiveRecord::Base.connection.create_table :users, force: true
+User.create
+User.create
 
-# # Create one record on slave, emulating replication delay
-# ActiveRecord::Base.establish_connection(:test_slave)
-# ActiveRecord::Base.connection.create_table :users, force: true
-# User.create
+# Create one record on slave, emulating replication lag
+ActiveRecord::Base.establish_connection(:test_slave)
+ActiveRecord::Base.connection.create_table :users, force: true
+User.create
 
+# Reconnect to master
 ActiveRecord::Base.establish_connection(:test)
