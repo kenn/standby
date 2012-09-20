@@ -100,6 +100,8 @@ If you're using ActiveRecord in a non-Rails app (e.g. Sinatra), be sure to set `
 ```ruby
 Slavery.env = 'development'
 
+ActiveRecord::Base.send(:include, Slavery)
+
 ActiveRecord::Base.configurations = {
   'development' =>        { adapter: 'mysql2', ... },
   'development_slave' =>  { adapter: 'mysql2', ... }
