@@ -8,8 +8,8 @@ Gem::Specification.new do |gem|
   gem.version       = Slavery::VERSION
   gem.authors       = ['Kenn Ejima']
   gem.email         = ['kenn.ejima@gmail.com']
-  gem.description   = %q{Simple, conservative slave read for ActiveRecord}
-  gem.summary       = %q{Simple, conservative slave read for ActiveRecord}
+  gem.description   = %q{Simple, conservative slave reads for ActiveRecord}
+  gem.summary       = %q{Simple, conservative slave reads for ActiveRecord}
   gem.homepage      = 'https://github.com/kenn/slavery'
 
   gem.files         = `git ls-files`.split($/)

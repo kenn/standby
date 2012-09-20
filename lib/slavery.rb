@@ -62,7 +62,10 @@ module Slavery
     end
 
     def slaveryable?
-      inside_transaction = master_connection.open_transactions > 0
+      base_transaction_depth = defined?(ActiveSupport::TestCase) &&
+        ActiveSupport::TestCase.respond_to?(:use_transactional_fixtures) &&
+        ActiveSupport::TestCase.try(:use_transactional_fixtures) ? 1 : 0
+      inside_transaction = master_connection.open_transactions > base_transaction_depth
       raise Error.new('on_slave cannot be used inside transaction block!') if inside_transaction
 
       !Slavery.disabled
