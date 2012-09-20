@@ -91,7 +91,7 @@ In such an event, you don't want to manually remove `Slavery.on_slave` from your
 Slavely.disabled = true
 ```
 
-With this line, Slavery stops connection switching and all queries go to the master database.
+With this line, Slavery stops connection switching and all queries go to the new master database.
 
 ## Support for non-Rails apps
 
