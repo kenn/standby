@@ -51,7 +51,7 @@ development_slave:
   <<: *common
 ```
 
-At this point, Slavery does nothing. Run tests and confirm that anything isn't broken.
+At this point, Slavery does nothing. Run tests and confirm that nothing is broken.
 
 ## Usage
 
@@ -95,7 +95,7 @@ With this user, writes on slave should raises an exception.
 Slavery.on_slave { User.create } 	# => ActiveRecord::StatementInvalid: Mysql2::Error: INSERT command denied...
 ```
 
-It is a good idea to confirm this behavior in your test code.
+It is a good idea to confirm this behavior in your test code as well.
 
 ## Database failure
 
