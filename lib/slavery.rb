@@ -41,6 +41,10 @@ module Slavery
       with_slavery true, &block
     end
 
+    def clear_connection_holder
+      @slave_connection_holder = nil
+    end
+
     def on_master(&block)
       with_slavery false, &block
     end
@@ -83,10 +87,23 @@ module Slavery
     def slave_connection_holder
       @slave_connection_holder ||= Class.new(ActiveRecord::Base) {
         self.abstract_class = true
-        establish_connection("#{Slavery.env}_slave")
+        establish_new_connection
       }
-    rescue ActiveRecord::AdapterNotSpecified
-      raise Error.new("#{Slavery.env}_slave does not exist!")
     end
+
+    def establish_new_connection
+      slave_spec = "#{Slavery.env}_slave"
+      if ActiveRecord::Base.configurations[slave_spec]
+        establish_connection(slave_spec)
+      else
+        master_spec = "#{Slavery.env}"
+        establish_connection(master_spec)
+      end
+    end
+
+    def clear_connection_holder
+      @slave_connection_holder = nil
+    end
+
   end
 end
