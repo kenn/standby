@@ -36,6 +36,21 @@ By convention, config keys with `[env]_slave` are automatically used for slave r
 
 Notice that we just copied the settings of `development` to `development_slave`. For `development` and `test`, it's actually recommended as probably you don't want to have replicating multiple databases on your machine. Two connections to the same identical database should be fine for testing purpose.
 
+In case you prefer DRYer definition, YAML's aliasing and key merging might help.
+
+```yaml
+common: &common
+  adapter: mysql2
+  username: root
+  database: myapp_development
+
+development:
+  <<: *common
+
+development_slave:
+  <<: *common
+```
+
 At this point, Slavery does nothing. Run tests and confirm that anything isn't broken.
 
 ## Usage
@@ -63,14 +78,6 @@ end
 For an extra safeguard, it is recommended to use a read-only user for slave access.
 
 ```yaml
-common: &common
-  adapter: mysql2
-  username: root
-  database: myapp_development
-
-development:
-  <<: *common
-
 development_slave:
   <<: *common
   username: readonly
