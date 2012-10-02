@@ -52,4 +52,16 @@ describe Slavery do
     Slavery.stub(:disabled).and_return(true)
     Slavery.on_slave { User.slaveryable?.should == false }
   end
+
+  it 'connects to master if slave configuration not specified' do
+    begin
+      User.clear_connection_holder
+      old_config = ActiveRecord::Base.configurations
+      ActiveRecord::Base.configurations['test_slave'] = nil
+
+      Slavery.on_slave { User.count }.should == 2
+    ensure
+      ActiveRecord::Base.configurations = old_config
+    end
+  end
 end
