@@ -53,15 +53,31 @@ describe Slavery do
     Slavery.on_slave { User.slaveryable?.should == false }
   end
 
-  it 'connects to master if slave configuration not specified' do
-    begin
-      User.clear_connection_holder
-      old_config = ActiveRecord::Base.configurations
+  describe 'configuration' do
+    before do
+      # Backup connection and configs
+      @old_conn = User.instance_variable_get :@slave_connection_holder
+      @old_config = ActiveRecord::Base.configurations.dup
+      User.instance_variable_set :@slave_connection_holder, nil
+    end
+
+    after do
+      # Restore connection and configs
+      User.instance_variable_set :@slave_connection_holder, @old_conn
+      ActiveRecord::Base.configurations = @old_config
+    end
+
+    it 'connects to master if slave configuration not specified' do
       ActiveRecord::Base.configurations['test_slave'] = nil
 
       Slavery.on_slave { User.count }.should == 2
-    ensure
-      ActiveRecord::Base.configurations = old_config
+    end
+
+    it 'raises error when no configuration found' do
+      ActiveRecord::Base.configurations['test'] = nil
+      ActiveRecord::Base.configurations['test_slave'] = nil
+
+      expect { Slavery.on_slave { User.count } }.to raise_error(Slavery::Error)
     end
   end
 end
