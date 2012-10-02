@@ -62,11 +62,18 @@ end
 
 For an extra safeguard, it is recommended to use a read-only user for slave access.
 
-```ruby
-development_slave:
+```yaml
+common: &common
   adapter: mysql2
-  username: readonly
+  username: root
   database: myapp_development
+
+development:
+  <<: *common
+
+development_slave:
+  <<: *common
+  username: readonly
 ```
 
 With MySQL, `GRANT SELECT` creates a read-only user.
