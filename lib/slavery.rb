@@ -85,7 +85,7 @@ module Slavery
 
     # Create an anonymous AR class to hold slave connection
     def slave_connection_holder
-      @slave_connection_holder ||= Class.new(ActiveRecord::Base) {
+      Thread.current[:slavery_connection] ||= Class.new(ActiveRecord::Base) {
         self.abstract_class = true
 
         def self.name

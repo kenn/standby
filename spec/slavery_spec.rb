@@ -105,4 +105,10 @@ describe Slavery do
       expect { Slavery.on_slave { User.count } }.to raise_error(Slavery::Error)
     end
   end
+
+  it "uses the same connection for all models" do
+    Slavery.on_slave do
+      User.connection.should == ActiveRecord::Base.connection
+    end
+  end
 end
