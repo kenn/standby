@@ -22,13 +22,9 @@ And create slave configs for each environment.
 
 ```yaml
 development:
-  adapter: mysql2
-  username: root
   database: myapp_development
 
 development_slave:
-  adapter: mysql2
-  username: root
   database: myapp_development
 ```
 
@@ -72,6 +68,14 @@ Slavery.on_slave do
   ...
 end
 ```
+
+Alternatively, you may call `on_slave` directly on the scope, so that the query will be read from slave when it's executed.
+
+```ruby
+User.on_slave.where(active: true).count
+```
+
+Caveat: `pluck` is not supported by the scope syntax, you still need `Slavery.on_slave` in this case.
 
 ## Read-only user
 

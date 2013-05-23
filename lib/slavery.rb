@@ -7,6 +7,8 @@ module Slavery
   extend ActiveSupport::Concern
 
   included do
+    require 'slavery/relation'
+
     class << self
       alias_method_chain :connection, :slavery
     end
@@ -16,13 +18,21 @@ module Slavery
 
   mattr_accessor :disabled
 
-  module ModuleFunctions
+  class << self
     def on_slave(&block)
-      ActiveRecord::Base.on_slave(&block)
+      run true, &block
     end
 
     def on_master(&block)
-      ActiveRecord::Base.on_master(&block)
+      run false, &block
+    end
+
+    def run(new_value)
+      old_value = Thread.current[:on_slave] # Save for recursive nested calls
+      Thread.current[:on_slave] = new_value
+      yield
+    ensure
+      Thread.current[:on_slave] = old_value
     end
 
     def env
@@ -34,23 +44,12 @@ module Slavery
       @env = ActiveSupport::StringInquirer.new(string)
     end
   end
-  extend ModuleFunctions
 
   module ClassMethods
-    def on_slave(&block)
-      with_slavery true, &block
-    end
-
-    def on_master(&block)
-      with_slavery false, &block
-    end
-
-    def with_slavery(new_value)
-      old_value = Thread.current[:on_slave] # Save for recursive nested calls
-      Thread.current[:on_slave] = new_value
-      yield
-    ensure
-      Thread.current[:on_slave] = old_value
+    def on_slave
+      context = scoped
+      context.slavery_target = :slave
+      context
     end
 
     def connection_with_slavery

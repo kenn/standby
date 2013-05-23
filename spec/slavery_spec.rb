@@ -53,6 +53,14 @@ describe Slavery do
     Slavery.on_slave { User.slaveryable?.should == false }
   end
 
+  it 'works with scopes' do
+    User.count.should == 2
+    User.on_slave.count.should == 1
+
+    User.scoped.to_a.size.should == 2
+    User.on_slave.scoped.to_a.size.should == 1
+  end
+
   describe 'configuration' do
     before do
       # Backup connection and configs
