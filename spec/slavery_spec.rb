@@ -57,8 +57,10 @@ describe Slavery do
     User.count.should == 2
     User.on_slave.count.should == 1
 
-    User.scoped.to_a.size.should == 2
-    User.on_slave.scoped.to_a.size.should == 1
+    # Why where(nil)?
+    # http://stackoverflow.com/questions/18198963/with-rails-4-model-scoped-is-deprecated-but-model-all-cant-replace-it
+    User.where(nil).to_a.size.should == 2
+    User.on_slave.where(nil).to_a.size.should == 1
   end
 
   describe 'configuration' do

@@ -47,7 +47,9 @@ module Slavery
 
   module ClassMethods
     def on_slave
-      context = scoped
+      # Why where(nil)?
+      # http://stackoverflow.com/questions/18198963/with-rails-4-model-scoped-is-deprecated-but-model-all-cant-replace-it
+      context = where(nil)
       context.slavery_target = :slave
       context
     end
@@ -82,6 +84,10 @@ module Slavery
     def slave_connection_holder
       @slave_connection_holder ||= Class.new(ActiveRecord::Base) {
         self.abstract_class = true
+
+        def self.name
+          "SlaveConnectionHolder"
+        end
 
         spec = ["#{Slavery.env}_slave", Slavery.env].find do |spec|
           ActiveRecord::Base.configurations[spec]

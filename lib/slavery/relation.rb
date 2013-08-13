@@ -1,7 +1,7 @@
 class ActiveRecord::Relation
   attr_accessor :slavery_target
 
-  # Supports queries like User.on_slave.all
+  # Supports queries like User.on_slave.to_a
   def exec_queries_with_slavery
     if slavery_target == :slave
       Slavery.on_slave { exec_queries_without_slavery }
