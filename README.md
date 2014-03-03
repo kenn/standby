@@ -6,7 +6,7 @@ Probably you just start off with one single database. As your app grows, you wou
 
 * Conservative - Safe by default. Installing Slavery won't change your app's current behavior.
 * Future proof - No dirty hacks, simply works as a proxy for `ActiveRecord::Base.connection`.
-* Simple - Less than 100 LOC, you can read the entire source and completely stay in control.
+* Simple - Only 100+ LOC, you can read the entire source and completely stay in control.
 
 Slavery works with ActiveRecord 3 or later.
 
@@ -129,16 +129,16 @@ ActiveRecord::Base.configurations = {
 ActiveRecord::Base.establish_connection(:development)
 ```
 
-## Custom slave spec name in database.yml
+## Custom slave key in database.yml
 
 This is useful for deploying on EngineYard where the configuration key in database.yml is simple "slave". Put the following line in `config/initializers/slavery.rb`.
 
 ```ruby
-Slavery.slave_spec_name = "slave" #instead of production_slave
+Slavery.spec_key = "slave" #instead of production_slave
 ```
 
 Alternatively you can pass it a lambda for dynamically setting this.
 
 ```ruby
-Slavery.slave_spec_name = lambda{ "#{Slavery.env}_slave" }
+Slavery.spec_key = lambda{ "#{Slavery.env}_slave" }
 ```

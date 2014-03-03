@@ -16,18 +16,15 @@ module Slavery
 
   class Error < StandardError; end
 
-  mattr_accessor :disabled
-  mattr_accessor :slave_spec_name
+  mattr_accessor :disabled, :env, :spec_key
 
   class << self
-    def slave_spec_name
-      if @@slave_spec_name.nil?
-        @@slave_spec_name = "#{Slavery.env}_slave"
-      elsif @@slave_spec_name && @@slave_spec_name.kind_of?(Proc)
-        @@slave_spec_name = @@slave_spec_name.call
+    def spec_key
+      case @@spec_key
+      when String   then @@spec_key
+      when Proc     then @@spec_key = @@spec_key.call
+      when NilClass then @@spec_key = "#{Slavery.env}_slave"
       end
-
-      @@slave_spec_name
     end
 
     def on_slave(&block)
@@ -47,12 +44,7 @@ module Slavery
     end
 
     def env
-      self.env = defined?(Rails) ? Rails.env.to_s : 'development' unless @env
-      @env
-    end
-
-    def env=(string)
-      @env = ActiveSupport::StringInquirer.new(string)
+      @@env ||= defined?(Rails) ? Rails.env.to_s : 'development'
     end
   end
 
@@ -100,9 +92,9 @@ module Slavery
           "SlaveConnectionHolder"
         end
 
-        spec = [Slavery.slave_spec_name, Slavery.env].find do |spec|
-          ActiveRecord::Base.configurations[spec]
-        end or raise Error.new("#{Slavery.slave_spec_name} or #{Slavery.env} must exist!")
+        spec = [Slavery.spec_key, Slavery.env].find do |spec_key|
+          ActiveRecord::Base.configurations[spec_key]
+        end or raise Error.new("#{Slavery.spec_key} or #{Slavery.env} must exist!")
 
         establish_connection spec
       }
