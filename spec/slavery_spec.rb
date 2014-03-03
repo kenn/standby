@@ -53,6 +53,21 @@ describe Slavery do
     Slavery.on_slave { User.slaveryable?.should == false }
   end
 
+  it 'sets the Slavery database spec name by configuration' do
+    Slavery.slave_spec_name = "custom_slave"
+    Slavery.slave_spec_name.should eq 'custom_slave'
+
+    Slavery.slave_spec_name = lambda{
+      "kewl_slave"
+    }
+    Slavery.slave_spec_name.should eq "kewl_slave"    
+
+    Slavery.slave_spec_name = lambda{
+      "#{Slavery.env}_slave"
+    }
+    Slavery.slave_spec_name.should eq "test_slave"
+  end
+
   it 'works with scopes' do
     User.count.should == 2
     User.on_slave.count.should == 1
@@ -78,14 +93,14 @@ describe Slavery do
     end
 
     it 'connects to master if slave configuration not specified' do
-      ActiveRecord::Base.configurations['test_slave'] = nil
+      ActiveRecord::Base.configurations[Slavery.slave_spec_name] = nil
 
       Slavery.on_slave { User.count }.should == 2
     end
 
     it 'raises error when no configuration found' do
       ActiveRecord::Base.configurations['test'] = nil
-      ActiveRecord::Base.configurations['test_slave'] = nil
+      ActiveRecord::Base.configurations[Slavery.slave_spec_name] = nil
 
       expect { Slavery.on_slave { User.count } }.to raise_error(Slavery::Error)
     end
