@@ -128,3 +128,17 @@ ActiveRecord::Base.configurations = {
 }
 ActiveRecord::Base.establish_connection(:development)
 ```
+
+## Custom slave spec name in database.yml
+
+This is useful for deploying on EngineYard where the configuration key in database.yml is simple "slave". Put the following line in `config/initializers/slavery.rb`.
+
+```ruby
+Slavery.slave_spec_name = "slave" #instead of production_slave
+```
+
+Alternatively you can pass it a lambda for dynamically setting this.
+
+```ruby
+Slavery.slave_spec_name = lambda{ "#{Slavery.env}_slave" }
+```
