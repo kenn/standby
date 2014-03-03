@@ -17,8 +17,19 @@ module Slavery
   class Error < StandardError; end
 
   mattr_accessor :disabled
+  mattr_accessor :slave_spec_name
 
   class << self
+    def slave_spec_name
+      if @@slave_spec_name.nil?
+        @@slave_spec_name = "#{Slavery.env}_slave"
+      elsif @@slave_spec_name && @@slave_spec_name.kind_of?(Proc)
+        @@slave_spec_name = @@slave_spec_name.call
+      end
+
+      @@slave_spec_name
+    end
+
     def on_slave(&block)
       run true, &block
     end
@@ -89,9 +100,9 @@ module Slavery
           "SlaveConnectionHolder"
         end
 
-        spec = ["#{Slavery.env}_slave", Slavery.env].find do |spec|
+        spec = [Slavery.slave_spec_name, Slavery.env].find do |spec|
           ActiveRecord::Base.configurations[spec]
-        end or raise Error.new("#{Slavery.env}_slave or #{Slavery.env} must exist!")
+        end or raise Error.new("#{Slavery.slave_spec_name} or #{Slavery.env} must exist!")
 
         establish_connection spec
       }
