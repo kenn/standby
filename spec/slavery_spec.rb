@@ -60,7 +60,7 @@ describe Slavery do
     Slavery.spec_key = lambda{
       "kewl_slave"
     }
-    Slavery.spec_key.should eq "kewl_slave"    
+    Slavery.spec_key.should eq "kewl_slave"
 
     Slavery.spec_key = lambda{
       "#{Slavery.env}_slave"
@@ -103,6 +103,18 @@ describe Slavery do
       ActiveRecord::Base.configurations[Slavery.spec_key] = nil
 
       expect { Slavery.on_slave { User.count } }.to raise_error(Slavery::Error)
+    end
+
+    it 'works with SLAVE_DATABASE_URL environment variable' do
+      Slavery.spec_key = nil
+      Slavery.env = nil
+
+      ENV['SLAVE_DATABASE_URL'] = 'sqlite3:///?database=test_slave_db'
+
+      Slavery.on_slave  { User.count }.should == 1
+
+      ENV['SLAVE_DATABASE_URL'] = nil
+      Slavery.env = 'test'
     end
   end
 end

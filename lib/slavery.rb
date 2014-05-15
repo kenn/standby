@@ -94,7 +94,7 @@ module Slavery
 
         spec = [Slavery.spec_key, Slavery.env].find do |spec_key|
           ActiveRecord::Base.configurations[spec_key]
-        end or raise Error.new("#{Slavery.spec_key} or #{Slavery.env} must exist!")
+        end || ENV['SLAVE_DATABASE_URL'] or raise Error.new("#{Slavery.spec_key} or #{Slavery.env} must exist!")
 
         establish_connection spec
       }
