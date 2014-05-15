@@ -60,7 +60,7 @@ describe Slavery do
     Slavery.spec_key = lambda{
       "kewl_slave"
     }
-    Slavery.spec_key.should eq "kewl_slave"    
+    Slavery.spec_key.should eq "kewl_slave"
 
     Slavery.spec_key = lambda{
       "#{Slavery.env}_slave"

@@ -96,7 +96,7 @@ module Slavery
           ActiveRecord::Base.configurations[spec_key]
         end or raise Error.new("#{Slavery.spec_key} or #{Slavery.env} must exist!")
 
-        establish_connection spec
+        establish_connection spec.to_sym
       }
     end
   end
