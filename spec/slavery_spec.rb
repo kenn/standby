@@ -81,14 +81,14 @@ describe Slavery do
   describe 'configuration' do
     before do
       # Backup connection and configs
-      @old_conn = User.instance_variable_get :@slave_connection_holder
+      @old_conn = Thread.current[:slavery_connection]
       @old_config = ActiveRecord::Base.configurations.dup
-      User.instance_variable_set :@slave_connection_holder, nil
+      Thread.current[:slavery_connection] = nil
     end
 
     after do
       # Restore connection and configs
-      User.instance_variable_set :@slave_connection_holder, @old_conn
+      Thread.current[:slavery_connection] = @old_conn
       ActiveRecord::Base.configurations = @old_config
     end
 
