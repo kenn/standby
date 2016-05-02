@@ -6,36 +6,36 @@ describe Slavery do
   end
 
   it 'sets thread local' do
-    Slavery.on_master { on_slave?.should == false }
-    Slavery.on_slave  { on_slave?.should == true }
+    Slavery.on_master { expect(on_slave?).to be false }
+    Slavery.on_slave  { expect(on_slave?).to be true }
   end
 
   it 'returns value from block' do
-    Slavery.on_master { User.count }.should == 2
-    Slavery.on_slave  { User.count }.should == 1
+    expect(Slavery.on_master { User.count }).to be 2
+    expect(Slavery.on_slave  { User.count }).to be 1
   end
 
   it 'handles nested calls' do
     # Slave -> Slave
     Slavery.on_slave do
-      on_slave?.should == true
+      expect(on_slave?).to be true
 
       Slavery.on_slave do
-        on_slave?.should == true
+        expect(on_slave?).to be true
       end
 
-      on_slave?.should == true
+      expect(on_slave?).to be true
     end
 
     # Slave -> Master
     Slavery.on_slave do
-      on_slave?.should == true
+      expect(on_slave?).to be true
 
       Slavery.on_master do
-        on_slave?.should == false
+        expect(on_slave?).to be false
       end
 
-      on_slave?.should == true
+      expect(on_slave?).to be true
     end
   end
 
@@ -46,36 +46,36 @@ describe Slavery do
   end
 
   it 'disables by configuration' do
-    Slavery.stub(:disabled).and_return(false)
-    Slavery.on_slave { User.slaveryable?.should == true }
+    allow(Slavery).to receive(:disabled).and_return(false)
+    Slavery.on_slave { expect(User.slaveryable?).to be true }
 
-    Slavery.stub(:disabled).and_return(true)
-    Slavery.on_slave { User.slaveryable?.should == false }
+    allow(Slavery).to receive(:disabled).and_return(true)
+    Slavery.on_slave { expect(User.slaveryable?).to be false }
   end
 
   it 'sets the Slavery database spec name by configuration' do
     Slavery.spec_key = "custom_slave"
-    Slavery.spec_key.should eq 'custom_slave'
+    expect(Slavery.spec_key).to eq 'custom_slave'
 
     Slavery.spec_key = lambda{
       "kewl_slave"
     }
-    Slavery.spec_key.should eq "kewl_slave"
+    expect(Slavery.spec_key).to eq "kewl_slave"
 
     Slavery.spec_key = lambda{
       "#{Slavery.env}_slave"
     }
-    Slavery.spec_key.should eq "test_slave"
+    expect(Slavery.spec_key).to eq "test_slave"
   end
 
   it 'works with scopes' do
-    User.count.should == 2
-    User.on_slave.count.should == 1
+    expect(User.count).to be 2
+    expect(User.on_slave.count).to be 1
 
     # Why where(nil)?
     # http://stackoverflow.com/questions/18198963/with-rails-4-model-scoped-is-deprecated-but-model-all-cant-replace-it
-    User.where(nil).to_a.size.should == 2
-    User.on_slave.where(nil).to_a.size.should == 1
+    expect(User.where(nil).to_a.size).to be 2
+    expect(User.on_slave.where(nil).to_a.size).to be 1
   end
 
   describe 'configuration' do
@@ -95,7 +95,7 @@ describe Slavery do
     it 'connects to master if slave configuration not specified' do
       ActiveRecord::Base.configurations[Slavery.spec_key] = nil
 
-      Slavery.on_slave { User.count }.should == 2
+      expect(Slavery.on_slave { User.count }).to be 2
     end
 
     it 'raises error when no configuration found' do
