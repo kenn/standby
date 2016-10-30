@@ -16,9 +16,11 @@ module Slavery
 
   class Error < StandardError; end
 
-  mattr_accessor :disabled, :env, :spec_key
+  mattr_accessor :env, :spec_key
 
   class << self
+    attr_accessor :disabled
+
     def spec_key
       case @@spec_key
       when String   then @@spec_key
