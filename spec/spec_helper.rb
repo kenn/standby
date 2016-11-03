@@ -20,13 +20,17 @@ ActiveRecord::Base.configurations = {
 
 # Create two records on master
 ActiveRecord::Base.establish_connection(:test)
-ActiveRecord::Base.connection.create_table :users, force: true
+ActiveRecord::Base.connection.create_table :users, force: true do |t|
+  t.boolean :disabled
+end
 User.create
 User.create
 
 # Create one record on slave, emulating replication lag
 ActiveRecord::Base.establish_connection(:test_slave)
-ActiveRecord::Base.connection.create_table :users, force: true
+ActiveRecord::Base.connection.create_table :users, force: true do |t|
+  t.boolean :disabled
+end
 User.create
 
 # Reconnect to master
