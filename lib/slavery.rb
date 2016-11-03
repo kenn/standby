@@ -1,7 +1,6 @@
 require 'slavery/version'
 require 'slavery/railtie'
 require 'active_record'
-require 'active_support/core_ext/module/attribute_accessors'
 
 module Slavery
   extend ActiveSupport::Concern
@@ -16,16 +15,15 @@ module Slavery
 
   class Error < StandardError; end
 
-  mattr_accessor :env, :spec_key
-
   class << self
     attr_accessor :disabled
+    attr_writer :env, :spec_key
 
     def spec_key
-      case @@spec_key
-      when String   then @@spec_key
-      when Proc     then @@spec_key = @@spec_key.call
-      when NilClass then @@spec_key = "#{Slavery.env}_slave"
+      case @spec_key
+      when String   then @spec_key
+      when Proc     then @spec_key = @spec_key.call
+      when NilClass then @spec_key = "#{Slavery.env}_slave"
       end
     end
 
@@ -46,7 +44,7 @@ module Slavery
     end
 
     def env
-      @@env ||= defined?(Rails) ? Rails.env.to_s : 'development'
+      @env ||= defined?(Rails) ? Rails.env.to_s : 'development'
     end
   end
 
