@@ -1,13 +1,17 @@
 require 'spec_helper'
 
 describe Slavery do
+  def slavery_value
+    Thread.current[:slavery]
+  end
+
   def on_slave?
-    Thread.current[:on_slave]
+    slavery_value == :slave
   end
 
   it 'sets thread local' do
-    Slavery.on_master { expect(on_slave?).to be false }
-    Slavery.on_slave  { expect(on_slave?).to be true }
+    Slavery.on_master { expect(slavery_value).to be :master }
+    Slavery.on_slave  { expect(slavery_value).to be :slave }
   end
 
   it 'returns value from block' do
@@ -39,36 +43,46 @@ describe Slavery do
     end
   end
 
-  it 'disables in transaction' do
+  it 'raises error in transaction' do
     User.transaction do
-      expect { User.slaveryable? }.to raise_error(Slavery::Error)
+      expect { Slavery.on_slave { User.first } }.to raise_error(Slavery::Error)
     end
   end
 
   it 'disables by configuration' do
-    allow(Slavery).to receive(:disabled).and_return(false)
-    Slavery.on_slave { expect(User.slaveryable?).to be true }
+    backup = Slavery.disabled
 
-    allow(Slavery).to receive(:disabled).and_return(true)
-    Slavery.on_slave { expect(User.slaveryable?).to be false }
+    Slavery.disabled = false
+    Slavery.on_slave { expect(slavery_value).to be :slave }
+
+    Slavery.disabled = true
+    Slavery.on_slave { expect(slavery_value).to be :master }
+
+    Slavery.disabled = backup
   end
 
   it 'sets the Slavery database spec name by configuration' do
-    Slavery.spec_key = "custom_slave"
+    Slavery.spec_key = 'custom_slave'
     expect(Slavery.spec_key).to eq 'custom_slave'
-
-    Slavery.spec_key = lambda{
-      "kewl_slave"
-    }
-    expect(Slavery.spec_key).to eq "kewl_slave"
-
-    Slavery.spec_key = lambda{
-      "#{Slavery.env}_slave"
-    }
-    expect(Slavery.spec_key).to eq "test_slave"
   end
 
-  it 'works with scopes' do
+  it 'avoids stack overflow with 3rdparty gem that defines alias_method. namely newrelic...' do
+    class ActiveRecord::Relation
+      alias_method :calculate_without_thirdparty, :calculate
+
+      def calculate(*args)
+        calculate_without_thirdparty(*args)
+      end
+    end
+
+    expect(User.count).to be 2
+
+    class ActiveRecord::Relation
+      alias_method :calculate, :calculate_without_thirdparty
+    end
+  end
+
+  it 'works with any scopes' do
     expect(User.count).to be 2
     expect(User.on_slave.count).to be 1
 
@@ -81,28 +95,30 @@ describe Slavery do
   describe 'configuration' do
     before do
       # Backup connection and configs
-      @old_conn = User.instance_variable_get :@slave_connection_holder
-      @old_config = ActiveRecord::Base.configurations.dup
-      User.instance_variable_set :@slave_connection_holder, nil
+      @backup_conn = Slavery.instance_variable_get :@slave_connection_holder
+      @backup_config = ActiveRecord::Base.configurations.dup
+      @backup_disabled = Slavery.disabled
+      Slavery.instance_variable_set :@slave_connection_holder, nil
     end
 
     after do
       # Restore connection and configs
-      User.instance_variable_set :@slave_connection_holder, @old_conn
-      ActiveRecord::Base.configurations = @old_config
+      Slavery.instance_variable_set :@slave_connection_holder, @backup_conn
+      ActiveRecord::Base.configurations = @backup_config
+      Slavery.disabled = @backup_disabled
+    end
+
+    it 'raises error if slave configuration not specified' do
+      ActiveRecord::Base.configurations['test_slave'] = nil
+
+      expect { Slavery.on_slave { User.count } }.to raise_error(Slavery::Error)
     end
 
     it 'connects to master if slave configuration not specified' do
-      ActiveRecord::Base.configurations[Slavery.spec_key] = nil
+      ActiveRecord::Base.configurations['test_slave'] = nil
+      Slavery.disabled = true
 
       expect(Slavery.on_slave { User.count }).to be 2
-    end
-
-    it 'raises error when no configuration found' do
-      ActiveRecord::Base.configurations['test'] = nil
-      ActiveRecord::Base.configurations[Slavery.spec_key] = nil
-
-      expect { Slavery.on_slave { User.count } }.to raise_error(Slavery::Error)
     end
   end
 end
