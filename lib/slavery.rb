@@ -1,12 +1,13 @@
 require 'active_record'
+require 'slavery/version'
 require 'slavery/base'
 require 'slavery/error'
 require 'slavery/connection_holder'
 require 'slavery/transaction'
-require 'slavery/version'
 require 'slavery/active_record/base'
 require 'slavery/active_record/connection_handling'
 require 'slavery/active_record/relation'
+require 'slavery/active_record/log_subscriber'
 
 module Slavery
   class << self
