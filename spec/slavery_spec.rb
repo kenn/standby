@@ -129,15 +129,19 @@ describe Slavery do
     end
 
     it 'connects to slave when specified as a url' do
-      parsed_url = {
-        'adapter'  => 'postgresql',
-        'username' => 'root',
-        'port'     => 5432,
-        'database' => 'test_slave',
-        'host'     => 'localhost'
-      }
+      expected = if Gem::Version.new(ActiveRecord::VERSION::STRING) < Gem::Version.new('4.1.0')
+        'postgres://root:@localhost:5432/test_slave'
+      else
+        {
+          'adapter'  => 'postgresql',
+          'username' => 'root',
+          'port'     => 5432,
+          'database' => 'test_slave',
+          'host'     => 'localhost'
+        }
+      end
       Slavery.spec_key = 'test_slave_url'
-      expect(Slavery::ConnectionHolder).to receive(:establish_connection).with(parsed_url)
+      expect(Slavery::ConnectionHolder).to receive(:establish_connection).with(expected)
       Slavery::ConnectionHolder.activate
     end
   end
