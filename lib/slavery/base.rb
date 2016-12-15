@@ -22,7 +22,7 @@ module Slavery
 
     def inside_transaction?
       open_transactions = run_on(:master) { ActiveRecord::Base.connection.open_transactions }
-      open_transactions > Slavery.base_transaction_depth
+      open_transactions > Slavery::Transaction.base_depth
     end
 
     def run_on(target)

@@ -95,15 +95,15 @@ describe Slavery do
   describe 'configuration' do
     before do
       # Backup connection and configs
-      @backup_conn = Slavery.instance_variable_get :@slave_connection_holder
+      @backup_conn = Slavery.instance_variable_get :@connection_holder
       @backup_config = ActiveRecord::Base.configurations.dup
       @backup_disabled = Slavery.disabled
-      Slavery.instance_variable_set :@slave_connection_holder, nil
+      Slavery.instance_variable_set :@connection_holder, nil
     end
 
     after do
       # Restore connection and configs
-      Slavery.instance_variable_set :@slave_connection_holder, @backup_conn
+      Slavery.instance_variable_set :@connection_holder, @backup_conn
       ActiveRecord::Base.configurations = @backup_config
       Slavery.disabled = @backup_disabled
     end
@@ -124,25 +124,21 @@ describe Slavery do
     it 'connects to slave when specified as a hash' do
       Slavery.spec_key = 'test_slave'
       hash = ActiveRecord::Base.configurations['test_slave']
-      expect(Slavery::SlaveConnectionHolder).to receive(:establish_connection).with(hash)
-      Slavery::SlaveConnectionHolder.activate
+      expect(Slavery::ConnectionHolder).to receive(:establish_connection).with(hash)
+      Slavery::ConnectionHolder.activate
     end
 
     it 'connects to slave when specified as a url' do
-      expected = if Gem::Version.new(ActiveRecord::VERSION::STRING) < Gem::Version.new("4.1.0")
-        "postgres://root:@localhost:5432/test_slave"
-      else
-        {
-          'adapter'  => 'postgresql',
-          'username' => 'root',
-          'port'     => 5432,
-          'database' => 'test_slave',
-          'host'     => 'localhost'
-        }
-      end
+      parsed_url = {
+        'adapter'  => 'postgresql',
+        'username' => 'root',
+        'port'     => 5432,
+        'database' => 'test_slave',
+        'host'     => 'localhost'
+      }
       Slavery.spec_key = 'test_slave_url'
-      expect(Slavery::SlaveConnectionHolder).to receive(:establish_connection).with(expected)
-      Slavery::SlaveConnectionHolder.activate
+      expect(Slavery::ConnectionHolder).to receive(:establish_connection).with(parsed_url)
+      Slavery::ConnectionHolder.activate
     end
   end
 end

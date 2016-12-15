@@ -6,7 +6,7 @@ module ActiveRecord
       def connection
         case Thread.current[:slavery]
         when :slave
-          Slavery.slave_connection_holder.connection_without_slavery
+          Slavery.connection_holder.connection_without_slavery
         when :master, NilClass
           connection_without_slavery
         else
