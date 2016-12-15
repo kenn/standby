@@ -12,9 +12,12 @@ module Slavery
     attr_writer :spec_key
 
     def spec_key
-      case @spec_key
-      when String   then @spec_key
-      when NilClass then @spec_key = "#{ActiveRecord::ConnectionHandling::RAILS_ENV.call}_slave"
+      @spec_key ||= if defined?(ActiveRecord::ConnectionHandling::RAILS_ENV)
+        "#{ActiveRecord::ConnectionHandling::RAILS_ENV.call}_slave"
+      elsif env = (Rails.env if defined?(Rails.env)) || ENV["RAILS_ENV"] || ENV["RACK_ENV"]
+        "#{env}_slave"
+      else
+        raise Error.new('Slavery.spec_key invalid!')
       end
     end
 
