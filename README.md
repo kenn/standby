@@ -1,5 +1,7 @@
 # Slavery - Simple, conservative slave reads for ActiveRecord
 
+[![Build Status](https://travis-ci.org/citrus/slavery.svg?branch=rails3.2)](https://travis-ci.org/citrus/slavery)
+
 Slavery is a simple, easy to use gem for ActiveRecord that enables conservative slave reads, which means it doesn't automatically redirect all SELECTs to slaves.
 
 Instead, you can do `Slavery.on_slave { User.count }` to send a particular query to a slave.
