@@ -1,6 +1,6 @@
 # Slavery - Simple, conservative slave reads for ActiveRecord
 
-[![Build Status](https://travis-ci.org/citrus/slavery.svg?branch=rails3.2)](https://travis-ci.org/citrus/slavery)
+[![Build Status](https://travis-ci.org/kenn/slavery.svg)](https://travis-ci.org/kenn/slavery)
 
 Slavery is a simple, easy to use gem for ActiveRecord that enables conservative slave reads, which means it doesn't automatically redirect all SELECTs to slaves.
 
@@ -49,6 +49,13 @@ development:
 
 development_slave:
   <<: *common
+```
+
+Optionally, you can use a database url for your connections:
+
+```yaml
+development: postgres://root:@localhost:5432/myapp_development
+development_slave: postgres://root:@localhost:5432/myapp_development_slave
 ```
 
 At this point, Slavery does nothing. Run tests and confirm that nothing is broken.
@@ -101,6 +108,12 @@ With this user, writes on slave should raise an exception.
 
 ```ruby
 Slavery.on_slave { User.create } 	# => ActiveRecord::StatementInvalid: Mysql2::Error: INSERT command denied...
+```
+
+With Postgres you can set the entire database to be readonly:
+
+```SQL
+ALTER DATABASE myapp_development_slave SET default_transaction_read_only = true;
 ```
 
 It is a good idea to confirm this behavior in your test code as well.
