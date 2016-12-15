@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require_relative "../spec/spec_helper"
+require "irb"
+IRB.start
