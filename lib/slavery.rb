@@ -4,6 +4,7 @@ require 'slavery/error'
 require 'slavery/slave_connection_holder'
 require 'slavery/version'
 require 'slavery/active_record/base'
+require 'slavery/active_record/connection_handling'
 require 'slavery/active_record/relation'
 
 module Slavery
@@ -12,13 +13,7 @@ module Slavery
     attr_writer :spec_key
 
     def spec_key
-      @spec_key ||= if defined?(ActiveRecord::ConnectionHandling::RAILS_ENV)
-        "#{ActiveRecord::ConnectionHandling::RAILS_ENV.call}_slave"
-      elsif env = (Rails.env if defined?(Rails.env)) || ENV["RAILS_ENV"] || ENV["RACK_ENV"]
-        "#{env}_slave"
-      else
-        raise Error.new('Slavery.spec_key invalid!')
-      end
+      @spec_key ||= "#{ActiveRecord::ConnectionHandling::RAILS_ENV.call}_slave"
     end
 
     def on_slave(&block)
