@@ -4,6 +4,7 @@ require 'slavery/error'
 require 'slavery/slave_connection_holder'
 require 'slavery/version'
 require 'slavery/active_record/base'
+require 'slavery/active_record/connection_handling'
 require 'slavery/active_record/relation'
 
 module Slavery
@@ -12,10 +13,7 @@ module Slavery
     attr_writer :spec_key
 
     def spec_key
-      case @spec_key
-      when String   then @spec_key
-      when NilClass then @spec_key = "#{ActiveRecord::ConnectionHandling::RAILS_ENV.call}_slave"
-      end
+      @spec_key ||= "#{ActiveRecord::ConnectionHandling::RAILS_ENV.call}_slave"
     end
 
     def on_slave(&block)
