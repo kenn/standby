@@ -120,5 +120,25 @@ describe Slavery do
 
       expect(Slavery.on_slave { User.count }).to be 2
     end
+
+    it 'connects to slave when specified as a hash' do
+      Slavery.spec_key = 'test_slave'
+      hash = ActiveRecord::Base.configurations['test_slave']
+      expect(Slavery::SlaveConnectionHolder).to receive(:establish_connection).with(hash)
+      Slavery::SlaveConnectionHolder.activate
+    end
+
+    it 'connects to slave when specified as a url' do
+      parsed_url = {
+        'adapter'  => 'postgresql',
+        'username' => 'root',
+        'port'     => 5432,
+        'database' => 'test_slave',
+        'host'     => 'localhost'
+      }
+      Slavery.spec_key = 'test_slave_url'
+      expect(Slavery::SlaveConnectionHolder).to receive(:establish_connection).with(parsed_url)
+      Slavery::SlaveConnectionHolder.activate
+    end
   end
 end

@@ -5,8 +5,9 @@ module Slavery
     class << self
       # for delayed activation
       def activate
-        raise Error.new('Slavery.spec_key invalid!') unless ActiveRecord::Base.configurations[Slavery.spec_key]
-        establish_connection Slavery.spec_key.to_sym
+        spec = ActiveRecord::Base.configurations[Slavery.spec_key]
+        raise Error.new('Slavery.spec_key invalid!') if spec.nil?
+        establish_connection spec
       end
     end
   end
