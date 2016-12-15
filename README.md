@@ -154,4 +154,5 @@ Slavery.spec_key = "slave" #instead of production_slave
 
 ## Changelog
 
+* v2.1.0: Debug log support / Database URL support / Rails 3.2 & 4.0 compatibility (Thanks to [@citrus](https://github.com/citrus))
 * v2.0.0: Rails 5 support
