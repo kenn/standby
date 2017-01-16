@@ -123,7 +123,7 @@ It is a good idea to confirm this behavior in your test code as well.
 You can quickly disable slave reads by dropping the following line in `config/initializers/slavery.rb`.
 
 ```ruby
-Slavely.disabled = true
+Slavery.disabled = true
 ```
 
 With this line, Slavery stops connection switching and all queries go to the master.
