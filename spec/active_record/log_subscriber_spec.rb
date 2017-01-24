@@ -10,10 +10,11 @@ describe ActiveRecord::LogSubscriber do
 
     before do
       ActiveRecord::Base.logger = logger
+      @backup_disabled = Slavery.disabled
     end
 
     after do
-      Slavery.disabled = false
+      Slavery.disabled = @backup_disabled
     end
 
     it 'it prefixes log messages with master' do
