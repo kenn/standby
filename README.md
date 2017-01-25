@@ -130,6 +130,20 @@ With this line, Slavery stops connection switching and all queries go to the mas
 
 This may be useful when one of the master or the slave goes down. You would rewrite `database.yml` to make all queries go to the surviving database, until you restore or rebuild the failed one.
 
+## Transactional fixtures
+
+When `use_transactional_fixtures` is set to `true`, it's NOT recommended to
+write to the database besides fixtures, since the slave connection is not aware
+of changes performed in the master connection due to [transaction isolation](https://en.wikipedia.org/wiki/Isolation_(database_systems)).
+
+In that case, you are suggested to disable Slavery in the test environment by
+putting the following in `test/test_helper.rb`
+(or `spec/spec_helper.rb` for RSpec users):
+
+```ruby
+Slavery.disabled = true
+```
+
 ## Support for non-Rails apps
 
 If you're using ActiveRecord in a non-Rails app (e.g. Sinatra), be sure to set `RACK_ENV` environment variable in the boot sequence, then:
