@@ -6,9 +6,9 @@ ENV['RACK_ENV'] = 'test'
 require 'slavery'
 
 ActiveRecord::Base.configurations = {
-  'test' =>            { adapter: 'sqlite3', database: 'test_db' },
-  'test_slave'     =>  { adapter: 'sqlite3', database: 'test_slave_db' },
-  'test_slave_url' => "postgres://root:@localhost:5432/test_slave"
+  'test'            =>  { 'adapter' => 'sqlite3', 'database' => 'test_db' },
+  'test_slave'      =>  { 'adapter' => 'sqlite3', 'database' => 'test_slave_db' },
+  'test_slave_url'  =>  'postgres://root:@localhost:5432/test_slave'
 }
 
 # Prepare databases
