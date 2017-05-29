@@ -11,11 +11,11 @@ module Slavery
   private
 
     def decide_with(target)
-      raise Slavery::Error.new('on_slave cannot be used inside transaction block!') if inside_transaction?
-
       if Slavery.disabled
         :master
       else
+        raise Slavery::Error.new('on_slave cannot be used inside transaction block!') if inside_transaction?
+
         target
       end
     end
