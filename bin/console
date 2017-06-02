@@ -2,4 +2,7 @@
 
 require_relative "../spec/spec_helper"
 require "irb"
+
+ActiveRecord::Base.logger = ActiveSupport::Logger.new(STDOUT)
+
 IRB.start

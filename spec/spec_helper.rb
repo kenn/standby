@@ -13,18 +13,41 @@ ActiveRecord::Base.configurations = {
 
 # Prepare databases
 class User < ActiveRecord::Base
+  has_many :items
 end
 
-# Create two records on master
-ActiveRecord::Base.establish_connection(:test)
-ActiveRecord::Base.connection.create_table :users, force: true
-User.create
-User.create
+class Item < ActiveRecord::Base
+  belongs_to :user
+end
 
-# Create one record on slave, emulating replication lag
-ActiveRecord::Base.establish_connection(:test_slave)
-ActiveRecord::Base.connection.create_table :users, force: true
-User.create
+class Seeder
+  def run
+    # Populate on master
+    connect(:test)
+    create_tables
+    User.create
+    User.create
+    User.first.items.create
 
-# Reconnect to master
-ActiveRecord::Base.establish_connection(:test)
+    # Populate on slave, emulating replication lag
+    connect(:test_slave)
+    create_tables
+    User.create
+
+    # Reconnect to master
+    connect(:test)
+  end
+
+  def create_tables
+    ActiveRecord::Base.connection.create_table :users, force: true
+    ActiveRecord::Base.connection.create_table :items, force: true do |t|
+      t.references :user
+    end
+  end
+
+  def connect(env)
+    ActiveRecord::Base.establish_connection(env)
+  end
+end
+
+Seeder.new.run
