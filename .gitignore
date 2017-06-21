@@ -19,3 +19,4 @@ tmp
 
 test_db
 test_slave_db
+test_slave_foo

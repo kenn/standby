@@ -18,7 +18,13 @@ module Slavery
       @spec_key ||= "#{ActiveRecord::ConnectionHandling::RAILS_ENV.call}_slave"
     end
 
-    def on_slave(&block)
+    def slave_pools
+      @slave_pools ||= {}
+    end
+
+    def on_slave(slave_name = "slave", &block)
+      @spec_key = "#{ActiveRecord::ConnectionHandling::RAILS_ENV.call}_#{slave_name}"
+
       Base.new(:slave).run &block
     end
 
