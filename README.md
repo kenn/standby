@@ -30,6 +30,9 @@ development:
 
 development_slave:
   database: myapp_development
+
+development_slave_foo:
+  database: mysapp_development_foo
 ```
 
 By convention, config keys with `[env]_slave` are automatically used for slave reads.
@@ -66,6 +69,7 @@ To start using Slavery, you need to add `Slavery.on_slave` in your code. Queries
 
 ```ruby
 Slavery.on_slave { User.count } 	# => runs on slave
+Slavery.on_slave(:slave_foo) { User.count }  # => runs on another slave
 ```
 
 You can nest `on_slave` and `on_master` interchangeably. The following code works as expected.
