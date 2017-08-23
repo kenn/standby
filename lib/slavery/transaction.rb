@@ -10,12 +10,19 @@ module Slavery
     class << self
       def base_depth
         @base_depth ||= if defined?(ActiveSupport::TestCase) &&
-          TEST_CONFIG_METHODS.any? { |m| ActiveSupport::TestCase.try(m) }
+          transactional_fixtures_enabled?
         then
           1
         else
           0
         end
+      end
+
+      private
+
+      def transactional_fixtures_enabled?
+        config = ActiveSupport::TestCase
+        TEST_CONFIG_METHODS.any? {|m| config.respond_to?(m) and config.send(m) }
       end
     end
   end
