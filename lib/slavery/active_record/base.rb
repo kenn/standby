@@ -15,12 +15,12 @@ module ActiveRecord
       end
 
       # Generate scope at top level e.g. User.on_slave
-      def on_slave(slave_name = "slave")
+      def on_slave(slave_extension = nil)
         # Why where(nil)?
         # http://stackoverflow.com/questions/18198963/with-rails-4-model-scoped-is-deprecated-but-model-all-cant-replace-it
         context = where(nil)
         context.slavery_target = :slave
-        context.slave_name = slave_name
+        context.slave_extension = slave_extension
         context
       end
     end

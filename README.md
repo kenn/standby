@@ -69,7 +69,7 @@ To start using Slavery, you need to add `Slavery.on_slave` in your code. Queries
 
 ```ruby
 Slavery.on_slave { User.count } 	# => runs on slave
-Slavery.on_slave(:slave_foo) { User.count }  # => runs on another slave
+Slavery.on_slave(:foo) { User.count }  # => runs on another slave; use :foo or "foo"
 ```
 
 You can nest `on_slave` and `on_master` interchangeably. The following code works as expected.
