@@ -23,7 +23,7 @@ module Slavery
     end
 
     def on_slave(slave_extension = nil, &block)
-      slave_name = slave_extension ? "slave_#{slave_extension}" : "slave"
+      slave_name = slave_extension.present? ? "slave_#{slave_extension}" : "slave"
       @spec_key = "#{ActiveRecord::ConnectionHandling::RAILS_ENV.call}_#{slave_name}"
 
       Base.new(:slave).run &block

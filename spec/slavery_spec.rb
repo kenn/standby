@@ -12,7 +12,7 @@ describe Slavery do
   it 'sets thread local' do
     Slavery.on_master { expect(slavery_value).to be :master }
     Slavery.on_slave  { expect(slavery_value).to be :slave }
-    Slavery.on_slave("foo") { expect(slavery_value).to be :slave}
+    Slavery.on_slave(:foo) { expect(slavery_value).to be :slave}
   end
 
   it 'returns value from block' do
@@ -84,9 +84,24 @@ describe Slavery do
     end
   end
 
+  it 'works with nils and blanks' do
+    replica_value = User.on_slave.count
+    expect(User.on_slave("").count).to be replica_value
+    expect(User.on_slave(nil).count).to be replica_value
+  end
+
+  it 'works with symbols and strings' do
+    foo_replica_value = User.on_slave(:foo).count
+    expect(User.on_slave("foo").count).to be foo_replica_value
+  end
+
+  it 'raises with non existent extension' do
+    expect { Slavery.on_slave(:non_existent) { User.first } }.to raise_error(Slavery::Error)
+  end
+
   it 'works with any scopes' do
     expect(User.count).to be 2
-    expect(User.on_slave("foo").count).to be 0
+    expect(User.on_slave(:foo).count).to be 0
     expect(User.on_slave.count).to be 1
 
     # Why where(nil)?
