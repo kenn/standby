@@ -14,7 +14,7 @@ module Slavery
 
   class << self
     def connection_holder
-      slave_pools[Slavery.spec_key] ||= begin
+      slave_connections[Slavery.spec_key] ||= begin
         klass = Class.new(Slavery::ConnectionHolder) do
           self.abstract_class = true
         end

@@ -3,15 +3,15 @@ require 'spec_helper'
 describe 'configuration' do
   before do
     # Backup connection and configs
-    @backup_conn = Slavery.instance_variable_get :@slave_pools
+    @backup_conn = Slavery.instance_variable_get :@slave_connections
     @backup_config = ActiveRecord::Base.configurations.dup
     @backup_disabled = Slavery.disabled
-    Slavery.instance_variable_set :@slave_pools, {}
+    Slavery.instance_variable_set :@slave_connections, {}
   end
 
   after do
     # Restore connection and configs
-    Slavery.instance_variable_set :@slave_pools, @backup_conn
+    Slavery.instance_variable_set :@slave_connections, @backup_conn
     ActiveRecord::Base.configurations = @backup_config
     Slavery.disabled = @backup_disabled
   end

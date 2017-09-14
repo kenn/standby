@@ -12,13 +12,13 @@ describe Slavery do
   it 'sets thread local' do
     Slavery.on_master { expect(slavery_value).to be :master }
     Slavery.on_slave  { expect(slavery_value).to be :slave }
-    Slavery.on_slave(:foo) { expect(slavery_value).to be :slave}
+    Slavery.on_slave(:two) { expect(slavery_value).to be :slave}
   end
 
   it 'returns value from block' do
     expect(Slavery.on_master { User.count }).to be 2
     expect(Slavery.on_slave  { User.count }).to be 1
-    expect(Slavery.on_slave(:foo) { User.count }).to be 0
+    expect(Slavery.on_slave(:two) { User.count }).to be 0
   end
 
   it 'handles nested calls' do
@@ -91,8 +91,8 @@ describe Slavery do
   end
 
   it 'works with symbols and strings' do
-    foo_replica_value = User.on_slave(:foo).count
-    expect(User.on_slave("foo").count).to be foo_replica_value
+    two_replica_value = User.on_slave(:two).count
+    expect(User.on_slave("two").count).to be two_replica_value
   end
 
   it 'raises with non existent extension' do
@@ -101,13 +101,13 @@ describe Slavery do
 
   it 'works with any scopes' do
     expect(User.count).to be 2
-    expect(User.on_slave(:foo).count).to be 0
+    expect(User.on_slave(:two).count).to be 0
     expect(User.on_slave.count).to be 1
 
     # Why where(nil)?
     # http://stackoverflow.com/questions/18198963/with-rails-4-model-scoped-is-deprecated-but-model-all-cant-replace-it
     expect(User.where(nil).to_a.size).to be 2
-    expect(User.on_slave(:foo).where(nil).to_a.size).to be 0
+    expect(User.on_slave(:two).where(nil).to_a.size).to be 0
     expect(User.on_slave.where(nil).to_a.size).to be 1
   end
 end
