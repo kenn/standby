@@ -66,6 +66,7 @@ describe Slavery do
   it 'sets the Slavery database spec name by configuration' do
     Slavery.spec_key = 'custom_slave'
     expect(Slavery.spec_key).to eq 'custom_slave'
+    Slavery.spec_key = nil
   end
 
   it 'avoids stack overflow with 3rdparty gem that defines alias_method. namely newrelic...' do

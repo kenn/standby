@@ -14,6 +14,7 @@ describe 'configuration' do
     Slavery.instance_variable_set :@slave_connections, @backup_conn
     ActiveRecord::Base.configurations = @backup_config
     Slavery.disabled = @backup_disabled
+    Slavery.spec_key = nil
   end
 
   it 'raises error if slave configuration not specified' do

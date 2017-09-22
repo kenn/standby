@@ -8,7 +8,7 @@ module ActiveRecord
         when :master, NilClass
           connection_without_slavery
         else
-          Slavery.connection_holder.connection_without_slavery
+          Slavery.connection_holder(Thread.current[:slavery],Thread.current[:slavery_spec]).connection_without_slavery
         end
       end
 

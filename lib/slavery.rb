@@ -23,11 +23,11 @@ module Slavery
     end
 
     def on_slave(name = nil, &block)
-      extension = "_#{name}" if name.present? && name.to_s != "slave"
-      slave_name = "slave#{extension}"
-      @spec_key = "#{ActiveRecord::ConnectionHandling::RAILS_ENV.call}_#{slave_name}"
-
-      Base.new(slave_name.to_sym).run &block
+      if name.blank? || name.to_s == "slave"
+        Base.new(:slave,spec_key).run &block
+      else
+        Base.new("slave_#{name}".to_sym,"#{ActiveRecord::ConnectionHandling::RAILS_ENV.call}_slave_#{name}").run &block
+      end
     end
 
     def on_master(&block)
