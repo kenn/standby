@@ -12,7 +12,7 @@ describe Slavery do
   it 'sets thread local' do
     Slavery.on_master { expect(slavery_value).to be :master }
     Slavery.on_slave  { expect(slavery_value).to be :slave }
-    Slavery.on_slave(:two) { expect(slavery_value).to be :slave}
+    Slavery.on_slave(:two) { expect(slavery_value).to be :slave_two}
   end
 
   it 'returns value from block' do
