@@ -18,7 +18,7 @@ module Slavery
         klass = Class.new(Slavery::ConnectionHolder) do
           self.abstract_class = true
         end
-        klass_name = Slavery.spec_key.camelize
+        klass_name = "SlaveryConnection#{Slavery.spec_key.camelize}"
         Object.const_set(klass_name, klass) unless Object.const_defined?(klass_name)
         klass.activate
         klass
