@@ -1,23 +1,24 @@
 module Slavery
   class Base
-    def initialize(target,spec_key = nil)
-      @spec_key = spec_key
+    def initialize(target)
       @target = decide_with(target)
     end
 
     def run(&block)
-      run_on(@target, @spec_key, &block)
+      run_on(@target, &block)
     end
 
   private
 
     def decide_with(target)
-      if Slavery.disabled
+      if Slavery.disabled || target == :master
         :master
+      elsif inside_transaction?
+        raise Slavery::Error.new('on_slave cannot be used inside transaction block!')
+      elsif target.present? && target.to_s != "slave"
+        "slave_#{target}".to_sym
       else
-        raise Slavery::Error.new('on_slave cannot be used inside transaction block!') if inside_transaction?
-
-        target
+        :slave
       end
     end
 
@@ -26,15 +27,12 @@ module Slavery
       open_transactions > Slavery::Transaction.base_depth
     end
 
-    def run_on(target,spec_key = nil)
+    def run_on(target)
       backup = Thread.current[:slavery] # Save for recursive nested calls
-      spec_key_backup = Thread.current[:slavery_spec]
       Thread.current[:slavery] = target
-      Thread.current[:slavery_spec] = spec_key
       yield
     ensure
       Thread.current[:slavery] = backup
-      Thread.current[:slavery_spec] = spec_key_backup
     end
   end
 end

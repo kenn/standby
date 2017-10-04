@@ -18,16 +18,16 @@ module Slavery
       @spec_key ||= "#{ActiveRecord::ConnectionHandling::RAILS_ENV.call}_slave"
     end
 
+    def spec_key_for(target = nil)
+      target == nil ? spec_key : "#{ActiveRecord::ConnectionHandling::RAILS_ENV.call}_#{target}"
+    end
+
     def slave_connections
       @slave_connections ||= {}
     end
 
     def on_slave(name = nil, &block)
-      if name.blank? || name.to_s == "slave"
-        Base.new(:slave,spec_key).run &block
-      else
-        Base.new("slave_#{name}".to_sym,"#{ActiveRecord::ConnectionHandling::RAILS_ENV.call}_slave_#{name}").run &block
-      end
+      Base.new(name).run &block
     end
 
     def on_master(&block)
