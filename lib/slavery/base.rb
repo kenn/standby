@@ -5,7 +5,7 @@ module Slavery
     end
 
     def run(&block)
-      run_on(@target, &block)
+      run_on @target, &block
     end
 
   private
