@@ -12,14 +12,11 @@ require 'slavery/active_record/log_subscriber'
 module Slavery
   class << self
     attr_accessor :disabled
-    attr_writer :spec_key
-
-    def spec_key
-      @spec_key ||= "#{ActiveRecord::ConnectionHandling::RAILS_ENV.call}_slave"
-    end
+    attr_accessor :spec_key
 
     def spec_key_for(target = nil)
-      target == nil ? spec_key : "#{ActiveRecord::ConnectionHandling::RAILS_ENV.call}_#{target}"
+      spec = spec_key if target.nil? || target.to_s == "slave" # Support for Slavery.spec_key= 
+      spec || "#{ActiveRecord::ConnectionHandling::RAILS_ENV.call}_#{target}"
     end
 
     def slave_connections

@@ -6,6 +6,9 @@ describe 'configuration' do
     @backup_conn = Slavery.instance_variable_get :@slave_connections
     @backup_config = ActiveRecord::Base.configurations.dup
     @backup_disabled = Slavery.disabled
+    @backup_conn.each_key do |klass_name|
+      Object.send(:remove_const, klass_name) if Object.const_defined?(klass_name)
+    end
     Slavery.instance_variable_set :@slave_connections, {}
   end
 

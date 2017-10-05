@@ -6,7 +6,7 @@ module Slavery
       # for delayed activation
       def activate(target = nil)
         spec = ActiveRecord::Base.configurations[Slavery.spec_key_for(target)]
-        raise Error.new('Slavery.spec_key invalid!') if spec.nil?
+        raise Error.new("Slavery.spec_key or assigned slave target '#{target}' is invalid!") if spec.nil?
         establish_connection spec
       end
     end
@@ -14,11 +14,12 @@ module Slavery
 
   class << self
     def connection_holder(target)
-      slave_connections[target] ||= begin
+      klass_name = "Slavery#{target.to_s.camelize}ConnectionHolder"
+      slave_connections[klass_name] ||= begin
         klass = Class.new(Slavery::ConnectionHolder) do
           self.abstract_class = true
         end
-        Object.const_set("SlaveryConnection#{target.to_s.camelize}", klass)
+        Object.const_set(klass_name, klass)
         klass.activate(target)
         klass
       end
