@@ -13,11 +13,11 @@ module ActiveRecord
       end
 
       # Generate scope at top level e.g. User.on_slave
-      def on_slave(name = nil)
+      def on_slave(name = :null_state)
         # Why where(nil)?
         # http://stackoverflow.com/questions/18198963/with-rails-4-model-scoped-is-deprecated-but-model-all-cant-replace-it
         context = where(nil)
-        context.slavery_target = name.presence || :slave # Handle explicit nil or blank
+        context.slavery_target = name || :null_state
         context
       end
     end

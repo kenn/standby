@@ -66,7 +66,7 @@ To start using Slavery, you need to add `Slavery.on_slave` in your code. Queries
 
 ```ruby
 Slavery.on_slave { User.count } 	# => runs on slave
-Slavery.on_slave(:two) { User.count }  # => runs on another slave; use :two or "two"
+Slavery.on_slave(:two) { User.count }  # => runs on another slave configured as `development_slave_two`
 ```
 
 You can nest `on_slave` and `on_master` interchangeably. The following code works as expected.
@@ -159,15 +159,8 @@ ActiveRecord::Base.configurations = {
 ActiveRecord::Base.establish_connection(:development)
 ```
 
-## Custom slave key in database.yml
-
-This is useful for deploying on EngineYard where the configuration key in database.yml is simple "slave". Put the following line in `config/initializers/slavery.rb`.
-
-```ruby
-Slavery.spec_key = "slave" #instead of production_slave
-```
-
 ## Changelog
 
+* v3.0.0: Support for multiple slave targets ([@punchh](https://github.com/punchh))
 * v2.1.0: Debug log support / Database URL support / Rails 3.2 & 4.0 compatibility (Thanks to [@citrus](https://github.com/citrus))
 * v2.0.0: Rails 5 support

@@ -12,18 +12,13 @@ require 'slavery/active_record/log_subscriber'
 module Slavery
   class << self
     attr_accessor :disabled
-    attr_accessor :spec_key
-
-    def spec_key_for(target = nil)
-      spec = spec_key if target.nil? || target.to_s == "slave" # Support for Slavery.spec_key= 
-      spec || "#{ActiveRecord::ConnectionHandling::RAILS_ENV.call}_#{target}"
-    end
 
     def slave_connections
       @slave_connections ||= {}
     end
 
-    def on_slave(name = nil, &block)
+    def on_slave(name = :null_state, &block)
+      raise Slavery::Error.new('invalid slave target') unless name.is_a?(Symbol)
       Base.new(name).run &block
     end
 

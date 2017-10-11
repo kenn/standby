@@ -15,10 +15,12 @@ module Slavery
         :master
       elsif inside_transaction?
         raise Slavery::Error.new('on_slave cannot be used inside transaction block!')
-      elsif target.present? && target.to_s != "slave"
+      elsif target == :null_state
+        :slave
+      elsif target.present?
         "slave_#{target}".to_sym
       else
-        :slave
+        raise Slavery::Error.new('on_slave cannot be used with a nil target!')
       end
     end
 

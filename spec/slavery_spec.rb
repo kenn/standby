@@ -63,12 +63,6 @@ describe Slavery do
     Slavery.disabled = backup
   end
 
-  it 'sets the Slavery database spec name by configuration' do
-    Slavery.spec_key = 'custom_slave'
-    expect(Slavery.spec_key).to eq 'custom_slave'
-    Slavery.spec_key = nil
-  end
-
   it 'avoids stack overflow with 3rdparty gem that defines alias_method. namely newrelic...' do
     class ActiveRecord::Relation
       alias_method :calculate_without_thirdparty, :calculate
@@ -85,15 +79,14 @@ describe Slavery do
     end
   end
 
-  it 'works with nils and blanks' do
-    replica_value = User.on_slave.count
-    expect(User.on_slave("").count).to be replica_value
-    expect(User.on_slave(nil).count).to be replica_value
+  it 'works with nils like slave' do
+    expect(User.on_slave(nil).count).to be User.on_slave.count
   end
 
-  it 'works with symbols and strings' do
-    two_replica_value = User.on_slave(:two).count
-    expect(User.on_slave("two").count).to be two_replica_value
+  it 'raises on blanks and strings' do
+    expect { User.on_slave("").count }.to raise_error(Slavery::Error)
+    expect { User.on_slave("two").count }.to raise_error(Slavery::Error)
+    expect { User.on_slave("slave").count }.to raise_error(Slavery::Error)
   end
 
   it 'raises with non existent extension' do
