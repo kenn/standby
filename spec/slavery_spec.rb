@@ -12,11 +12,13 @@ describe Slavery do
   it 'sets thread local' do
     Slavery.on_master { expect(slavery_value).to be :master }
     Slavery.on_slave  { expect(slavery_value).to be :slave }
+    Slavery.on_slave(:two) { expect(slavery_value).to be :slave_two}
   end
 
   it 'returns value from block' do
     expect(Slavery.on_master { User.count }).to be 2
     expect(Slavery.on_slave  { User.count }).to be 1
+    expect(Slavery.on_slave(:two) { User.count }).to be 0
   end
 
   it 'handles nested calls' do
@@ -61,11 +63,6 @@ describe Slavery do
     Slavery.disabled = backup
   end
 
-  it 'sets the Slavery database spec name by configuration' do
-    Slavery.spec_key = 'custom_slave'
-    expect(Slavery.spec_key).to eq 'custom_slave'
-  end
-
   it 'avoids stack overflow with 3rdparty gem that defines alias_method. namely newrelic...' do
     class ActiveRecord::Relation
       alias_method :calculate_without_thirdparty, :calculate
@@ -82,13 +79,29 @@ describe Slavery do
     end
   end
 
+  it 'works with nils like slave' do
+    expect(User.on_slave(nil).count).to be User.on_slave.count
+  end
+
+  it 'raises on blanks and strings' do
+    expect { User.on_slave("").count }.to raise_error(Slavery::Error)
+    expect { User.on_slave("two").count }.to raise_error(Slavery::Error)
+    expect { User.on_slave("slave").count }.to raise_error(Slavery::Error)
+  end
+
+  it 'raises with non existent extension' do
+    expect { Slavery.on_slave(:non_existent) { User.first } }.to raise_error(Slavery::Error)
+  end
+
   it 'works with any scopes' do
     expect(User.count).to be 2
+    expect(User.on_slave(:two).count).to be 0
     expect(User.on_slave.count).to be 1
 
     # Why where(nil)?
     # http://stackoverflow.com/questions/18198963/with-rails-4-model-scoped-is-deprecated-but-model-all-cant-replace-it
     expect(User.where(nil).to_a.size).to be 2
+    expect(User.on_slave(:two).where(nil).to_a.size).to be 0
     expect(User.on_slave.where(nil).to_a.size).to be 1
   end
 end

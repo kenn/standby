@@ -18,4 +18,5 @@ test/version_tmp
 tmp
 
 test_db
-test_slave_db
+test_slave_one
+test_slave_two

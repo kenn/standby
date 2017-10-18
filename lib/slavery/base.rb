@@ -11,12 +11,16 @@ module Slavery
   private
 
     def decide_with(target)
-      if Slavery.disabled
+      if Slavery.disabled || target == :master
         :master
+      elsif inside_transaction?
+        raise Slavery::Error.new('on_slave cannot be used inside transaction block!')
+      elsif target == :null_state
+        :slave
+      elsif target.present?
+        "slave_#{target}".to_sym
       else
-        raise Slavery::Error.new('on_slave cannot be used inside transaction block!') if inside_transaction?
-
-        target
+        raise Slavery::Error.new('on_slave cannot be used with a nil target!')
       end
     end
 

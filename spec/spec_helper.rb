@@ -7,7 +7,8 @@ require 'slavery'
 
 ActiveRecord::Base.configurations = {
   'test'            =>  { 'adapter' => 'sqlite3', 'database' => 'test_db' },
-  'test_slave'      =>  { 'adapter' => 'sqlite3', 'database' => 'test_slave_db' },
+  'test_slave'      =>  { 'adapter' => 'sqlite3', 'database' => 'test_slave_one' },
+  'test_slave_two'  =>  { 'adapter' => 'sqlite3', 'database' => 'test_slave_two'},
   'test_slave_url'  =>  'postgres://root:@localhost:5432/test_slave'
 }
 
@@ -33,6 +34,10 @@ class Seeder
     connect(:test_slave)
     create_tables
     User.create
+
+    # Populate on slave two
+    connect(:test_slave_two)
+    create_tables
 
     # Reconnect to master
     connect(:test)
