@@ -12,7 +12,11 @@ require 'slavery/active_record/log_subscriber'
 module Slavery
   class << self
     attr_accessor :disabled
-    attr_writer :spec_key
+
+    def spec_key=(key)
+      ActiveSupport::Deprecation.warn("Slavery.spec_key= is deprecated and will be removed from v3")
+      @spec_key = key
+    end
 
     def spec_key
       @spec_key ||= "#{ActiveRecord::ConnectionHandling::RAILS_ENV.call}_slave"
