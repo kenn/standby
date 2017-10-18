@@ -145,6 +145,10 @@ putting the following in `test/test_helper.rb`
 Slavery.disabled = true
 ```
 
+## Upgrading from version 2 to version 3
+
+Please note that `Slavery.spec_key=` method has been removed from version 3.
+
 ## Support for non-Rails apps
 
 If you're using ActiveRecord in a non-Rails app (e.g. Sinatra), be sure to set `RACK_ENV` environment variable in the boot sequence, then:
