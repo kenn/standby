@@ -1,4 +1,4 @@
-module Slavery
+module Standby
   class ConnectionHolder < ActiveRecord::Base
     self.abstract_class = true
 
@@ -6,7 +6,7 @@ module Slavery
       # for delayed activation
       def activate(target)
         spec = ActiveRecord::Base.configurations["#{ActiveRecord::ConnectionHandling::RAILS_ENV.call}_#{target}"]
-        raise Error.new("Slave target '#{target}' is invalid!") if spec.nil?
+        raise Error.new("Standby target '#{target}' is invalid!") if spec.nil?
         establish_connection spec
       end
     end
@@ -14,9 +14,9 @@ module Slavery
 
   class << self
     def connection_holder(target)
-      klass_name = "Slavery#{target.to_s.camelize}ConnectionHolder"
-      slave_connections[klass_name] ||= begin
-        klass = Class.new(Slavery::ConnectionHolder) do
+      klass_name = "Standby#{target.to_s.camelize}ConnectionHolder"
+      standby_connections[klass_name] ||= begin
+        klass = Class.new(Standby::ConnectionHolder) do
           self.abstract_class = true
         end
         Object.const_set(klass_name, klass)

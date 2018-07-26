@@ -4,16 +4,13 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'standby/version'
 
 Gem::Specification.new do |gem|
-  gem.post_install_message = 'The slavery gem has been deprecated and has ' \
-                             'been replaced by standby. Please switch to ' \
-                             'standby as soon as possible.'
-  gem.name          = 'slavery'
+  gem.name          = 'standby'
   gem.version       = Standby::VERSION
   gem.authors       = ['Kenn Ejima']
   gem.email         = ['kenn.ejima@gmail.com']
-  gem.description   = %q{Simple, conservative slave reads for ActiveRecord}
-  gem.summary       = %q{Simple, conservative slave reads for ActiveRecord}
-  gem.homepage      = 'https://github.com/kenn/slavery'
+  gem.description   = %q{Read from stand-by databases for ActiveRecord}
+  gem.summary       = %q{Read from stand-by databases for ActiveRecord}
+  gem.homepage      = 'https://github.com/kenn/standby'
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^exe/}).map{ |f| File.basename(f) }

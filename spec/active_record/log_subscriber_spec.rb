@@ -10,30 +10,30 @@ describe ActiveRecord::LogSubscriber do
 
     before do
       ActiveRecord::Base.logger = logger
-      @backup_disabled = Slavery.disabled
+      @backup_disabled = Standby.disabled
     end
 
     after do
-      Slavery.disabled = @backup_disabled
+      Standby.disabled = @backup_disabled
     end
 
-    it 'it prefixes log messages with master' do
+    it 'it prefixes log messages with primary' do
       User.count
       log.rewind
-      expect(log.read).to include('[master]')
+      expect(log.read).to include('[primary]')
     end
 
-    it 'it prefixes log messages with the slave connection' do
-      User.on_slave.count
+    it 'it prefixes log messages with the standby connection' do
+      User.on_standby.count
       log.rewind
-      expect(log.read).to include('[slave]')
+      expect(log.read).to include('[standby]')
     end
 
-    it 'it does nothing when slavery is disabled' do
-      Slavery.disabled = true
+    it 'it does nothing when standby is disabled' do
+      Standby.disabled = true
       User.count
       log.rewind
-      expect(log.read).to_not include('[master]')
+      expect(log.read).to_not include('[primary]')
     end
 
   end

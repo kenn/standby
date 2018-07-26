@@ -1,4 +1,4 @@
-module Slavery
+module Standby
   class Transaction
     # The methods on ActiveSupport::TestCase which can potentially be used
     # to determine if transactional fixtures are enabled

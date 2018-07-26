@@ -1,66 +1,66 @@
 require 'spec_helper'
 
-describe Slavery do
-  def slavery_value
-    Thread.current[:slavery]
+describe Standby do
+  def standby_value
+    Thread.current[:_standby]
   end
 
-  def on_slave?
-    slavery_value == :slave
+  def on_standby?
+    standby_value == :standby
   end
 
   it 'sets thread local' do
-    Slavery.on_master { expect(slavery_value).to be :master }
-    Slavery.on_slave  { expect(slavery_value).to be :slave }
-    Slavery.on_slave(:two) { expect(slavery_value).to be :slave_two}
+    Standby.on_primary { expect(standby_value).to be :primary }
+    Standby.on_standby { expect(standby_value).to be :standby }
+    Standby.on_standby(:two) { expect(standby_value).to be :standby_two}
   end
 
   it 'returns value from block' do
-    expect(Slavery.on_master { User.count }).to be 2
-    expect(Slavery.on_slave  { User.count }).to be 1
-    expect(Slavery.on_slave(:two) { User.count }).to be 0
+    expect(Standby.on_primary { User.count }).to be 2
+    expect(Standby.on_standby  { User.count }).to be 1
+    expect(Standby.on_standby(:two) { User.count }).to be 0
   end
 
   it 'handles nested calls' do
-    # Slave -> Slave
-    Slavery.on_slave do
-      expect(on_slave?).to be true
+    # Standby -> Standby
+    Standby.on_standby do
+      expect(on_standby?).to be true
 
-      Slavery.on_slave do
-        expect(on_slave?).to be true
+      Standby.on_standby do
+        expect(on_standby?).to be true
       end
 
-      expect(on_slave?).to be true
+      expect(on_standby?).to be true
     end
 
-    # Slave -> Master
-    Slavery.on_slave do
-      expect(on_slave?).to be true
+    # Standby -> Primary
+    Standby.on_standby do
+      expect(on_standby?).to be true
 
-      Slavery.on_master do
-        expect(on_slave?).to be false
+      Standby.on_primary do
+        expect(on_standby?).to be false
       end
 
-      expect(on_slave?).to be true
+      expect(on_standby?).to be true
     end
   end
 
   it 'raises error in transaction' do
     User.transaction do
-      expect { Slavery.on_slave { User.first } }.to raise_error(Slavery::Error)
+      expect { Standby.on_standby { User.first } }.to raise_error(Standby::Error)
     end
   end
 
   it 'disables by configuration' do
-    backup = Slavery.disabled
+    backup = Standby.disabled
 
-    Slavery.disabled = false
-    Slavery.on_slave { expect(slavery_value).to be :slave }
+    Standby.disabled = false
+    Standby.on_standby { expect(standby_value).to be :standby }
 
-    Slavery.disabled = true
-    Slavery.on_slave { expect(slavery_value).to be :master }
+    Standby.disabled = true
+    Standby.on_standby { expect(standby_value).to be :primary }
 
-    Slavery.disabled = backup
+    Standby.disabled = backup
   end
 
   it 'avoids stack overflow with 3rdparty gem that defines alias_method. namely newrelic...' do
@@ -79,29 +79,29 @@ describe Slavery do
     end
   end
 
-  it 'works with nils like slave' do
-    expect(User.on_slave(nil).count).to be User.on_slave.count
+  it 'works with nils like standby' do
+    expect(User.on_standby(nil).count).to be User.on_standby.count
   end
 
   it 'raises on blanks and strings' do
-    expect { User.on_slave("").count }.to raise_error(Slavery::Error)
-    expect { User.on_slave("two").count }.to raise_error(Slavery::Error)
-    expect { User.on_slave("slave").count }.to raise_error(Slavery::Error)
+    expect { User.on_standby("").count }.to raise_error(Standby::Error)
+    expect { User.on_standby("two").count }.to raise_error(Standby::Error)
+    expect { User.on_standby("standby").count }.to raise_error(Standby::Error)
   end
 
   it 'raises with non existent extension' do
-    expect { Slavery.on_slave(:non_existent) { User.first } }.to raise_error(Slavery::Error)
+    expect { Standby.on_standby(:non_existent) { User.first } }.to raise_error(Standby::Error)
   end
 
   it 'works with any scopes' do
     expect(User.count).to be 2
-    expect(User.on_slave(:two).count).to be 0
-    expect(User.on_slave.count).to be 1
+    expect(User.on_standby(:two).count).to be 0
+    expect(User.on_standby.count).to be 1
 
     # Why where(nil)?
     # http://stackoverflow.com/questions/18198963/with-rails-4-model-scoped-is-deprecated-but-model-all-cant-replace-it
     expect(User.where(nil).to_a.size).to be 2
-    expect(User.on_slave(:two).where(nil).to_a.size).to be 0
-    expect(User.on_slave.where(nil).to_a.size).to be 1
+    expect(User.on_standby(:two).where(nil).to_a.size).to be 0
+    expect(User.on_standby.where(nil).to_a.size).to be 1
   end
 end

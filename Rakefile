@@ -1,4 +1,5 @@
-require 'bundler/gem_tasks'
+# require 'bundler/gem_tasks'
+Bundler::GemHelper.install_tasks(name: 'standby')
 
 # RSpec
 require 'rspec/core/rake_task'
