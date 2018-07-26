@@ -3,13 +3,13 @@ require 'bundler/setup'
 
 ENV['RACK_ENV'] = 'test'
 
-require 'slavery'
+require 'standby'
 
 ActiveRecord::Base.configurations = {
   'test'            =>  { 'adapter' => 'sqlite3', 'database' => 'test_db' },
-  'test_slave'      =>  { 'adapter' => 'sqlite3', 'database' => 'test_slave_one' },
-  'test_slave_two'  =>  { 'adapter' => 'sqlite3', 'database' => 'test_slave_two'},
-  'test_slave_url'  =>  'postgres://root:@localhost:5432/test_slave'
+  'test_standby'      =>  { 'adapter' => 'sqlite3', 'database' => 'test_standby_one' },
+  'test_standby_two'  =>  { 'adapter' => 'sqlite3', 'database' => 'test_standby_two'},
+  'test_standby_url'  =>  'postgres://root:@localhost:5432/test_standby'
 }
 
 # Prepare databases
@@ -23,23 +23,23 @@ end
 
 class Seeder
   def run
-    # Populate on master
+    # Populate on primary
     connect(:test)
     create_tables
     User.create
     User.create
     User.first.items.create
 
-    # Populate on slave, emulating replication lag
-    connect(:test_slave)
+    # Populate on standby, emulating replication lag
+    connect(:test_standby)
     create_tables
     User.create
 
-    # Populate on slave two
-    connect(:test_slave_two)
+    # Populate on standby two
+    connect(:test_standby_two)
     create_tables
 
-    # Reconnect to master
+    # Reconnect to primary
     connect(:test)
   end
 
