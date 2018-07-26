@@ -1,6 +1,6 @@
 # Standby - Read from standby databases for ActiveRecord (formerly Slavery)
 
-[![Build Status](https://travis-ci.org/kenn/slavery.svg)](https://travis-ci.org/kenn/slavery)
+[![Build Status](https://travis-ci.org/kenn/standby.svg)](https://travis-ci.org/kenn/standby)
 
 Standby is a simple, easy to use gem for ActiveRecord that enables conservative reading from standby databases, which means it won't automatically redirect all SELECTs to standbys.
 
