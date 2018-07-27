@@ -155,13 +155,10 @@ Update your Gemfile
 gem 'standby'
 ```
 
-Replace `Slavery` with `Standby`, `on_slave` with `on_standby`, and `on_master` with `on_primary`.
+Then
 
-```sh
-grep -e Slavery **/*.rake **/*.rb -s -l | xargs sed -i "" "s|Slavery|Standby|g"
-grep -e on_slave **/*.rake **/*.rb -s -l | xargs sed -i "" "s|on_slave|on_standby|g"
-grep -e on_master **/*.rake **/*.rb -s -l | xargs sed -i "" "s|on_master|on_primary|g"
-```
+* Replace `Slavery` with `Standby`, `on_slave` with `on_standby`, and `on_master` with `on_primary`
+* Update keys in `database.yml` (e.g. `development_slave` to `development_standby`)
 
 ## Upgrading from version 2 to version 3
 
