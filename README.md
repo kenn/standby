@@ -179,6 +179,7 @@ ActiveRecord::Base.establish_connection(:development)
 ```
 
 ## Running tests
+
 ```shell
 export RAILS_ENV=test
 
