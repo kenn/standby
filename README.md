@@ -178,6 +178,13 @@ ActiveRecord::Base.configurations = {
 ActiveRecord::Base.establish_connection(:development)
 ```
 
+## Running tests
+```shell
+export RAILS_ENV=test
+
+bundle exec rspec spec
+```
+
 ## Changelog
 
 * v4.0.0: Rename gem from Slavery to Standby
