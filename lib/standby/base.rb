@@ -25,6 +25,7 @@ module Standby
     end
 
     def inside_transaction?
+      return false unless ActiveRecord::Base.connected?
       open_transactions = run_on(:primary) { ActiveRecord::Base.connection.open_transactions }
       open_transactions > Standby::Transaction.base_depth
     end
