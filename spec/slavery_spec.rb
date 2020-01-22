@@ -104,4 +104,27 @@ describe Standby do
     expect(User.on_standby(:two).where(nil).to_a.size).to be 0
     expect(User.on_standby.where(nil).to_a.size).to be 1
   end
+
+  it 'works concurrently when connection is not established beforehand' do
+    threads = 50.times.map do |i|
+      Thread.new do
+        begin
+          # Wrapping with "with_connection" as on_standby checks if we are
+          # inside transaction using default connection of ActiveRecord::Base.
+          ActiveRecord::Base.connection_pool.with_connection do
+            Standby.on_standby(:three) do
+              ActiveRecord::Base.connection.exec_query "SELECT 1;"
+            end
+          end
+          i
+        ensure
+          # Checking the used connection back into connection_pool.
+          StandbyStandbyThreeConnectionHolder.connection_pool.release_connection if StandbyStandbyThreeConnectionHolder.connection_pool.active_connection?
+        end
+      end
+    end
+
+    threads.map(&:join)
+    expect(threads.map(&:value)).to match_array threads.size.times.to_a
+  end
 end
