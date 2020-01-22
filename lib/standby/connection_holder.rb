@@ -13,15 +13,19 @@ module Standby
   end
 
   class << self
+    MUTEX = Mutex.new
+
     def connection_holder(target)
       klass_name = "Standby#{target.to_s.camelize}ConnectionHolder"
-      standby_connections[klass_name] ||= begin
-        klass = Class.new(Standby::ConnectionHolder) do
-          self.abstract_class = true
+      standby_connections[klass_name] || MUTEX.synchronize do
+        standby_connections[klass_name] ||= begin
+          klass = Class.new(Standby::ConnectionHolder) do
+            self.abstract_class = true
+          end
+          Object.const_set(klass_name, klass)
+          klass.activate(target)
+          klass
         end
-        Object.const_set(klass_name, klass)
-        klass.activate(target)
-        klass
       end
     end
   end
