@@ -6,7 +6,7 @@ Standby is a simple, easy to use gem for ActiveRecord that enables conservative 
 
 Instead, you can do `Standby.on_standby { User.count }` to send a particular query to a standby.
 
-Background: Probably your app started off with one single database. As it grows, you would upgrade to a primary-standby (or master-slave) replication for redundancy. At this point, all queries still go to the primary and standbys are just backups. With that configuration, it's tempting to run some long-running queries on one of the standbys. And that's exactly what Standby does.
+Background: Probably your app started off with one single database. As it grows, you would upgrade to a primary-standby (or primary-replica) replication for redundancy. At this point, all queries still go to the primary and standbys are just backups. With that configuration, it's tempting to run some long-running queries on one of the standbys. And that's exactly what Standby does.
 
 * Conservative - Safe by default. Installing Standby won't change your app's current behavior.
 * Future proof - No dirty hacks. Simply works as a proxy for `ActiveRecord::Base.connection`.
