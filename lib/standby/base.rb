@@ -25,8 +25,13 @@ module Standby
     end
 
     def inside_transaction?
-      open_transactions = run_on(:primary) { ActiveRecord::Base.connection.open_transactions }
-      open_transactions > Standby::Transaction.base_depth
+      run_on(:primary) do
+        if ActiveRecord::Base.connection_handler.retrieve_connection_pool('primary').active_connection?
+          ActiveRecord::Base.connection.open_transactions > Standby::Transaction.base_depth
+        else
+          false
+        end
+      end
     end
 
     def run_on(target)
