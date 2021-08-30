@@ -15,10 +15,11 @@ ActiveRecord::Base.configurations = {
 # Prepare databases
 class User < ActiveRecord::Base
   has_many :items
+  attr_accessor :name
 end
 
 class Item < ActiveRecord::Base
-  belongs_to :user
+  belongs_to :user, inverse_of: :items
 end
 
 class Seeder

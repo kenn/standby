@@ -104,4 +104,10 @@ describe Standby do
     expect(User.on_standby(:two).where(nil).to_a.size).to be 0
     expect(User.on_standby.where(nil).to_a.size).to be 1
   end
+
+  it 'does not interfere with setting inverses' do
+    user = User.first
+    user.update(name: 'a different name')
+    expect(user.items.first.user.name).to eq('a different name')
+  end
 end
