@@ -20,13 +20,21 @@ describe 'configuration' do
   end
 
   it 'raises error if standby configuration not specified' do
-    ActiveRecord::Base.configurations['test_standby'] = nil
+    ActiveRecord::Base.configurations = {
+      'test' => { 'adapter' => 'sqlite3', 'database' => 'test_db' },
+      'test_standby_two' => { 'adapter' => 'sqlite3', 'database' => 'test_standby_two' },
+      'test_standby_url' => 'postgres://root:@localhost:5432/test_standby'
+    }
 
     expect { Standby.on_standby { User.count } }.to raise_error(Standby::Error)
   end
 
   it 'connects to primary if standby configuration is disabled' do
-    ActiveRecord::Base.configurations['test_standby'] = nil
+    ActiveRecord::Base.configurations = {
+      'test' => { 'adapter' => 'sqlite3', 'database' => 'test_db' },
+      'test_standby_two' => { 'adapter' => 'sqlite3', 'database' => 'test_standby_two' },
+      'test_standby_url' => 'postgres://root:@localhost:5432/test_standby'
+    }
     Standby.disabled = true
 
     expect(Standby.on_standby { User.count }).to be 2
