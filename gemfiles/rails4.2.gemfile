@@ -1,5 +1,9 @@
 source "https://rubygems.org"
 
+gemspec name: 'standby', path: '../'
+
 gem 'activerecord', '~> 4.2'
 
-gemspec name: 'standby', path: '../'
+group :development, :test do
+  gem 'sqlite3', '~> 1.3.6'
+end
