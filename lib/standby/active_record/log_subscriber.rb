@@ -9,7 +9,7 @@ module ActiveRecord
     end
 
     def log_header
-      if "#{Rails::VERSION::MAJOR}.#{Rails::VERSION::MINOR}".to_f >= 7.1
+      if Gem::Version.new(ActiveRecord.version) >= Gem::Version.new('7.1')
         color("[#{Thread.current[:_standby] || "primary"}]", ActiveSupport::LogSubscriber::GREEN, bold: true)
       else
         color("[#{Thread.current[:_standby] || "primary"}]", ActiveSupport::LogSubscriber::GREEN, true)

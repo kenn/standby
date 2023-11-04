@@ -12,11 +12,8 @@ doc/
 lib/bundler/man
 pkg
 rdoc
+spec/db
 spec/reports
 test/tmp
 test/version_tmp
 tmp
-
-test_db
-test_standby_one
-test_standby_two

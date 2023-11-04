@@ -8,10 +8,12 @@ jobs:
       matrix:
         ruby:
           - "2.5"
-          - "2.2"
         rails_version:
+          - "7.1"
           - "5.2"
           - "4.2"
+        bundler:
+          - "1.17.3"
     runs-on: ubuntu-latest
     env:
       BUNDLE_GEMFILE: gemfiles/rails${{ matrix.rails_version }}.gemfile
