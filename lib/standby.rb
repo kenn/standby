@@ -1,3 +1,4 @@
+require 'logger'
 require 'active_record'
 require 'standby/version'
 require 'standby/base'

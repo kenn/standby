@@ -10,6 +10,7 @@ jobs:
           - "2.7"
         rails_version:
           - "7.0"
+          - "6.1"
           - "5.2"
     runs-on: ubuntu-latest
     env:

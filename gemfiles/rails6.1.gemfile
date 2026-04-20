@@ -1,0 +1,13 @@
+source 'https://rubygems.org'
+
+gem 'activerecord', '~> 6.1'
+gem 'sqlite3', '~> 1.4'
+
+# Rails 6.1 compat with Ruby 3.4+ (these were removed from default gems)
+gem 'logger'
+gem 'mutex_m'
+gem 'bigdecimal'
+gem 'base64'
+gem 'drb'
+
+gemspec name: 'standby', path: '../'

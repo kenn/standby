@@ -6,7 +6,8 @@ module Standby
       # for delayed activation
       def activate(target)
         env_name = "#{ActiveRecord::ConnectionHandling::RAILS_ENV.call}_#{target}"
-        if Standby.version_gte?('7.0')
+        # Rails 6.1+ exposes DatabaseConfigurations helpers; older versions still use hash access.
+        if ActiveRecord::Base.configurations.respond_to?(:find_db_config)
           spec = ActiveRecord::Base.configurations.find_db_config(env_name)&.configuration_hash
         else
           spec = ActiveRecord::Base.configurations[env_name]

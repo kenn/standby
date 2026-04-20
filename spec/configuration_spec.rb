@@ -4,7 +4,8 @@ describe 'configuration' do
   before do
     # Backup connection and configs
     @backup_conn = (Standby.instance_variable_get(:@standby_connections) || {}).dup
-    if Standby.version_gte?('7.0')
+    # Rails 6.1+ wraps configurations in ActiveRecord::DatabaseConfigurations.
+    if ActiveRecord::Base.configurations.respond_to?(:configs_for)
       @backup_config = ActiveRecord::Base.configurations.configs_for.map do |config|
         [config.env_name, config.configuration_hash]
       end.to_h
@@ -26,7 +27,8 @@ describe 'configuration' do
   end
 
   it 'raises error if standby configuration not specified' do
-    if Standby.version_gte?('7.0')
+    # Rails 6.1+ no longer supports mutating configurations via hash-style access.
+    if ActiveRecord::Base.configurations.respond_to?(:configs_for)
       ActiveRecord::Base.configurations = @backup_config.merge({ 'test_standby' => {} })
     else
       ActiveRecord::Base.configurations['test_standby'] = nil
@@ -36,7 +38,8 @@ describe 'configuration' do
   end
 
   it 'connects to primary if standby configuration is disabled' do
-    if Standby.version_gte?('7.0')
+    # Rails 6.1+ no longer supports mutating configurations via hash-style access.
+    if ActiveRecord::Base.configurations.respond_to?(:configs_for)
       ActiveRecord::Base.configurations = @backup_config.merge({ 'test_standby' => {} })
     else
       ActiveRecord::Base.configurations['test_standby'] = nil
