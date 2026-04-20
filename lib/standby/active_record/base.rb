@@ -1,7 +1,17 @@
 module ActiveRecord
   class Base
     class << self
+      alias_method :connection_pool_without_standby, :connection_pool
       alias_method :connection_without_standby, :connection
+
+      def connection_pool
+        case Thread.current[:_standby]
+        when :primary, NilClass
+          connection_pool_without_standby
+        else
+          Standby.connection_holder(Thread.current[:_standby]).connection_pool_without_standby
+        end
+      end
 
       def connection
         case Thread.current[:_standby]

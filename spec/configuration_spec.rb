@@ -3,7 +3,7 @@ require 'spec_helper'
 describe 'configuration' do
   before do
     # Backup connection and configs
-    @backup_conn = Standby.instance_variable_get :@standby_connections
+    @backup_conn = (Standby.instance_variable_get(:@standby_connections) || {}).dup
     if Standby.version_gte?('7.0')
       @backup_config = ActiveRecord::Base.configurations.configs_for.map do |config|
         [config.env_name, config.configuration_hash]

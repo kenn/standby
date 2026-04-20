@@ -52,7 +52,11 @@ class Seeder
   end
 
   def connect(env)
+    ActiveRecord::Base.connection_pool.disconnect! if ActiveRecord::Base.connected?
     ActiveRecord::Base.establish_connection(env)
+    return unless ActiveRecord::Base.connection.adapter_name == 'SQLite'
+
+    ActiveRecord::Base.connection.execute('PRAGMA journal_mode=DELETE')
   end
 end
 
