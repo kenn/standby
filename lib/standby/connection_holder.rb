@@ -22,13 +22,15 @@ module Standby
   class << self
     def connection_holder(target)
       klass_name = "Standby#{target.to_s.camelize}ConnectionHolder"
-      standby_connections[klass_name] ||= begin
-        klass = Class.new(Standby::ConnectionHolder) do
-          self.abstract_class = true
+      standby_connections[klass_name] || standby_connections_mutex.synchronize do
+        standby_connections[klass_name] ||= begin
+          klass = Class.new(Standby::ConnectionHolder) do
+            self.abstract_class = true
+          end
+          Object.const_set(klass_name, klass)
+          klass.activate(target)
+          klass
         end
-        Object.const_set(klass_name, klass)
-        klass.activate(target)
-        klass
       end
     end
   end

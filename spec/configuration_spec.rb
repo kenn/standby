@@ -48,4 +48,35 @@ describe 'configuration' do
 
     expect(Standby.on_standby { User.count }).to be 2
   end
+
+  it 'initializes a standby connection holder once under contention' do
+    entered_activate = Queue.new
+    release_activate = Queue.new
+    call_count = 0
+
+    allow(Standby::ConnectionHolder).to receive(:activate).and_wrap_original do |original, target|
+      call_count += 1
+      if call_count == 1
+        entered_activate << true
+        release_activate.pop
+      end
+
+      original.call(target)
+    end
+
+    t1 = Thread.new { Standby.connection_holder(:standby) }
+    entered_activate.pop
+
+    t2 = Thread.new { Standby.connection_holder(:standby) }
+
+    expect(t2.join(0.1)).to be_nil
+    expect(call_count).to eq(1)
+
+    release_activate << true
+
+    [t1, t2].each(&:join)
+
+    expect(Standby.connection_holder(:standby).name).to eq('StandbyStandbyConnectionHolder')
+    expect(call_count).to eq(1)
+  end
 end

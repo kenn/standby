@@ -11,11 +11,18 @@ require 'standby/active_record/relation'
 require 'standby/active_record/log_subscriber'
 
 module Standby
+  @standby_connections = {}
+  @standby_connections_mutex = Mutex.new
+
   class << self
     attr_accessor :disabled
 
     def standby_connections
-      @standby_connections ||= {}
+      @standby_connections
+    end
+
+    def standby_connections_mutex
+      @standby_connections_mutex
     end
 
     def on_standby(name = :null_state, &block)
